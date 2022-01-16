@@ -20,6 +20,22 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>http://wh-308-3922mm.dyn.wichita.edu:5000</key>
+			<string></string>
+		</dict>
+	</dict>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Help us navigate by allowing us to view your location</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Help us navigate by allowing us to view your location</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Help us navigate by allowing us to view your location</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

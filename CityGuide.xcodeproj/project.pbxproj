@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BD2020AF26FD6A49005FDE90 /* SettingsTableController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD2020AE26FD6A49005FDE90 /* SettingsTableController.swift */; };
+		BD33706D272DF37A007BBD5E /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD33706C272DF37A007BBD5E /* Database.swift */; };
 		BD46858C26F1571A00AD1420 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD46858B26F1571A00AD1420 /* AppDelegate.swift */; };
 		BD46858E26F1571A00AD1420 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD46858D26F1571A00AD1420 /* SceneDelegate.swift */; };
 		BD46859026F1571A00AD1420 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD46858F26F1571A00AD1420 /* ViewController.swift */; };
@@ -15,6 +17,8 @@
 		BD46859826F1571E00AD1420 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BD46859626F1571E00AD1420 /* LaunchScreen.storyboard */; };
 		BD4685A326F1571F00AD1420 /* CityGuideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD4685A226F1571F00AD1420 /* CityGuideTests.swift */; };
 		BD4685AE26F1571F00AD1420 /* CityGuideUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD4685AD26F1571F00AD1420 /* CityGuideUITests.swift */; };
+		BD7DABB6274F032800DE62A7 /* SearchResultsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7DABB5274F032800DE62A7 /* SearchResultsVC.swift */; };
+		BDCD6BC7271B3E75006524FA /* Routing.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD6BC6271B3E75006524FA /* Routing.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +39,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BD2020AE26FD6A49005FDE90 /* SettingsTableController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableController.swift; sourceTree = "<group>"; };
+		BD33706C272DF37A007BBD5E /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		BD46858826F1571A00AD1420 /* CityGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CityGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD46858B26F1571A00AD1420 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BD46858D26F1571A00AD1420 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -49,6 +55,8 @@
 		BD4685A926F1571F00AD1420 /* CityGuideUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CityGuideUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD4685AD26F1571F00AD1420 /* CityGuideUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityGuideUITests.swift; sourceTree = "<group>"; };
 		BD4685AF26F1571F00AD1420 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BD7DABB5274F032800DE62A7 /* SearchResultsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsVC.swift; sourceTree = "<group>"; };
+		BDCD6BC6271B3E75006524FA /* Routing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routing.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,10 +110,14 @@
 				BD46858B26F1571A00AD1420 /* AppDelegate.swift */,
 				BD46858D26F1571A00AD1420 /* SceneDelegate.swift */,
 				BD46858F26F1571A00AD1420 /* ViewController.swift */,
+				BD2020AE26FD6A49005FDE90 /* SettingsTableController.swift */,
 				BD46859126F1571A00AD1420 /* Main.storyboard */,
 				BD46859426F1571E00AD1420 /* Assets.xcassets */,
 				BD46859626F1571E00AD1420 /* LaunchScreen.storyboard */,
 				BD46859926F1571E00AD1420 /* Info.plist */,
+				BDCD6BC6271B3E75006524FA /* Routing.swift */,
+				BD33706C272DF37A007BBD5E /* Database.swift */,
+				BD7DABB5274F032800DE62A7 /* SearchResultsVC.swift */,
 			);
 			path = CityGuide;
 			sourceTree = "<group>";
@@ -258,9 +270,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BD7DABB6274F032800DE62A7 /* SearchResultsVC.swift in Sources */,
+				BD33706D272DF37A007BBD5E /* Database.swift in Sources */,
 				BD46859026F1571A00AD1420 /* ViewController.swift in Sources */,
+				BD2020AF26FD6A49005FDE90 /* SettingsTableController.swift in Sources */,
 				BD46858C26F1571A00AD1420 /* AppDelegate.swift in Sources */,
 				BD46858E26F1571A00AD1420 /* SceneDelegate.swift in Sources */,
+				BDCD6BC7271B3E75006524FA /* Routing.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -437,6 +453,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 387DK82TXR;
 				INFOPLIST_FILE = CityGuide/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -455,6 +472,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 387DK82TXR;
 				INFOPLIST_FILE = CityGuide/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
