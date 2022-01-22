@@ -176,7 +176,6 @@ func pathFinder(current : Int, destination : Int) -> [Int]{
                 }
             }
             
-            print(nextNodeArr)
             if !nextNodeArr.isEmpty{
                 if !visited.contains(currentNode) && unvisited.contains(currentNode){
                     visited.append(currentNode)

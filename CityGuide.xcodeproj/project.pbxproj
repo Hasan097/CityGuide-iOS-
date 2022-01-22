@@ -18,6 +18,7 @@
 		BD4685A326F1571F00AD1420 /* CityGuideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD4685A226F1571F00AD1420 /* CityGuideTests.swift */; };
 		BD4685AE26F1571F00AD1420 /* CityGuideUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD4685AD26F1571F00AD1420 /* CityGuideUITests.swift */; };
 		BD7DABB6274F032800DE62A7 /* SearchResultsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7DABB5274F032800DE62A7 /* SearchResultsVC.swift */; };
+		BD81214227977D2400CEE55E /* InstructionGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD81214127977D2300CEE55E /* InstructionGenerator.swift */; };
 		BDCD6BC7271B3E75006524FA /* Routing.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD6BC6271B3E75006524FA /* Routing.swift */; };
 /* End PBXBuildFile section */
 
@@ -56,6 +57,7 @@
 		BD4685AD26F1571F00AD1420 /* CityGuideUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityGuideUITests.swift; sourceTree = "<group>"; };
 		BD4685AF26F1571F00AD1420 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BD7DABB5274F032800DE62A7 /* SearchResultsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsVC.swift; sourceTree = "<group>"; };
+		BD81214127977D2300CEE55E /* InstructionGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionGenerator.swift; sourceTree = "<group>"; };
 		BDCD6BC6271B3E75006524FA /* Routing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routing.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -110,6 +112,7 @@
 				BD46858B26F1571A00AD1420 /* AppDelegate.swift */,
 				BD46858D26F1571A00AD1420 /* SceneDelegate.swift */,
 				BD46858F26F1571A00AD1420 /* ViewController.swift */,
+				BD81214127977D2300CEE55E /* InstructionGenerator.swift */,
 				BD2020AE26FD6A49005FDE90 /* SettingsTableController.swift */,
 				BD46859126F1571A00AD1420 /* Main.storyboard */,
 				BD46859426F1571E00AD1420 /* Assets.xcassets */,
@@ -276,6 +279,7 @@
 				BD2020AF26FD6A49005FDE90 /* SettingsTableController.swift in Sources */,
 				BD46858C26F1571A00AD1420 /* AppDelegate.swift in Sources */,
 				BD46858E26F1571A00AD1420 /* SceneDelegate.swift in Sources */,
+				BD81214227977D2400CEE55E /* InstructionGenerator.swift in Sources */,
 				BDCD6BC7271B3E75006524FA /* Routing.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -7,8 +7,10 @@
 
 import UIKit
 import CoreLocation
+import AVFoundation
+import CoreHaptics
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
+class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynthesizerDelegate {
     @IBOutlet weak var recButton: UIButton!
     @IBOutlet weak var settingsBtn: UIButton!
 //    @IBOutlet weak var searchBar: UISearchBar!
@@ -24,16 +26,27 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     var groupID : Int = -1
     var floorNo : Int = -10
     var CURRENT_NODE = -1
+    var userAngle : Double = -1
+    var atBeaconInstr : [Int : String] = [:]
+    let srVC = SearchResultsVC()
+    let narator = AVSpeechSynthesizer()
+    var currentlyAt = -1
+    var engine: CHHapticEngine?
+    
+    //Flags
     var newGroupNoticed = false
     var getBeaconsFlag = false
     var getThePath = false
-    let srVC = SearchResultsVC()
+    var speechFlag = false
+    var recursionFlag = false
+    var indoorWayFindingFlag = false
+    var stopRepeatsFlag = true
         
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        overrideUserInterfaceStyle = .dark // The UI is better in darkmode.
+        narator.delegate = self
         
         beaconManager = CLLocationManager()
         beaconManager?.delegate = self
@@ -44,6 +57,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         locationManager?.requestAlwaysAuthorization()
         locationManager?.startUpdatingHeading()
         
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+        do {
+            engine = try CHHapticEngine()
+            try engine?.start()
+        } catch {
+            print("There was an error creating the engine: \(error.localizedDescription)")
+        }
+        
         if let userInputs = UserDefaults.standard.value(forKey: "userInputItems") as? [String : Float]{
             userDefinedRssi = userInputs["Set Threshold"] ?? (-80.00)
         }
@@ -51,10 +72,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         UIView.animate(withDuration: 0.5) {
-            var angle = newHeading.trueHeading
-            angle = angle * .pi / 180               // to convert degrees to radians
-//            var degrees = angle * 180 / .pi         // to convert radinas to degrees
+            let angle = newHeading.trueHeading
+//            let rad = angle * .pi / 180               // to convert degrees to radians
+//            let degrees = angle * 180 / .pi         // to convert radinas to degrees
+            self.userAngle = angle
+//            print("Direction: " + String(angle))
 //            print("Direction: " + String(degrees))
+//            print("Direction: " + String(rad))
             self.compassImage.transform = CGAffineTransform(rotationAngle: angle)
         }
     }
@@ -160,7 +184,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                         if checkerForHub.contains("Hub "){
                             let n = i["node"] as! Int
                             if n != shortestPath.first!{
-                                print("Re-Routing...")
+                                let utterance = AVSpeechUtterance(string: "Re-Routing")
+                                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+                                narator.speak(utterance)
                                 shortestPath = pathFinder(current: n, destination: shortestPath.last!)
                             }
                         }
@@ -168,6 +194,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 }
             }
             print(shortestPath)
+            if userAngle != -1{
+                atBeaconInstr = instructions(path: shortestPath, angle: userAngle)
+                speechFlag = true
+                recursionFlag = false
+                indoorWayFindingFlag = true
+            }
+            else{
+                print("User's Angle is still -1")
+            }
             pathFound = false
         }
         
@@ -176,13 +211,38 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             print("No Beacons Detected: ")
         case .immediate:
             print("Beacon is very close: " + String(describing: beacon!.minor) + " " + String(beacon!.rssi))
+            if indoorWayFindingFlag{
+                if !checkForReRoute(currNode: CURRENT_NODE){
+                    indoorWayFinding(beaconRSSI: beacon!.rssi)
+                    stopRepeatsFlag = true
+                }
+            }
         case .near:
             print("Beacon is near: "  + String(describing: beacon!.minor) + " " + String(beacon!.rssi))
+            if indoorWayFindingFlag{
+                if !checkForReRoute(currNode: CURRENT_NODE){
+                    indoorWayFinding(beaconRSSI: beacon!.rssi)
+                    stopRepeatsFlag = true
+                }
+            }
         case .far:
             print("Beacon is Far: "  + String(describing: beacon!.minor) + " " + String(beacon!.rssi))
             // rssi must be less than the set threshold
-            if Float(beacon!.rssi) < userDefinedRssi{
-                // call the screening window function.
+            if Float(beacon!.rssi) > userDefinedRssi && indoorWayFindingFlag{
+                if indoorWayFindingFlag{
+                    if !checkForReRoute(currNode: CURRENT_NODE){
+                        indoorWayFinding(beaconRSSI: beacon!.rssi)
+                        stopRepeatsFlag = true
+                    }
+                }
+            }
+            else{
+                if indoorWayFindingFlag && stopRepeatsFlag{
+                    let utterance = AVSpeechUtterance(string: "Please move closer to a recognizable beacon")
+                    utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+                    narator.speak(utterance)
+                    stopRepeatsFlag = false
+                }
             }
         @unknown default:
             print("No Beacons Detected (Default)")
@@ -244,6 +304,82 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             }
         }
         navigationController?.pushViewController(srVC, animated: true)
+    }
+    
+    func indoorWayFinding(beaconRSSI : Int){
+        if speechFlag && !recursionFlag{
+            hapticVibration()
+            for i in dArray{
+                if i["beacon_id"] as! Int == CURRENT_NODE{
+                    if let checkerForHub = i["locname"] as? String{
+                        if checkerForHub.contains("Hub "){
+                            let n = i["node"] as! Int
+                            let validRSSI = i["threshold"] as! Float
+                            if Float(beaconRSSI) < validRSSI{     // Check if within RSSI range set by server entry
+                                if atBeaconInstr[n]!.contains("destination."){
+                                    indoorWayFindingFlag = false
+                                    print("Near Destination")
+                                    hapticVibration(atDestination: true)
+                                }
+                                let utterance = AVSpeechUtterance(string: atBeaconInstr[n]!)
+                                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+                                narator.speak(utterance)
+                            }
+                        }
+                    }
+                }
+            }
+            currentlyAt = CURRENT_NODE
+            recursionFlag = true
+        }
+        if currentlyAt != CURRENT_NODE{
+            recursionFlag = false
+        }
+    }
+    
+    func checkForReRoute(currNode : Int) -> Bool{
+        for i in dArray{
+            if i["beacon_id"] as! Int == currNode{
+                if let checkerForHub = i["locname"] as? String{
+                    if checkerForHub.contains("Hub "){
+                        let n = i["node"] as! Int
+                        if !shortestPath.contains(n){
+                            let utterance = AVSpeechUtterance(string: "Rerouting")
+                            hapticVibration()
+                            utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+                            narator.speak(utterance)
+                            shortestPath = pathFinder(current: n, destination: shortestPath.last!)
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+    
+    func hapticVibration(atDestination : Bool? = false){
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+        
+        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 1)
+        let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 1)
+        let start = CHHapticParameterCurve.ControlPoint(relativeTime: 0, value: 1)
+        let end = CHHapticParameterCurve.ControlPoint(relativeTime: 1, value: 0)
+        let parameter = CHHapticParameterCurve(parameterID: .hapticIntensityControl, controlPoints: [start, end], relativeTime: 0)
+
+        let event = CHHapticEvent(eventType: .hapticContinuous, parameters: [sharpness, intensity], relativeTime: 0, duration: 0.5)
+        
+        if atDestination! == true{
+            usleep(500000) //0.5 seconds
+        }
+
+        do {
+            let pattern = try CHHapticPattern(events: [event], parameterCurves: [parameter])
+            let player = try engine?.makePlayer(with: pattern)
+            try player?.start(atTime: 0)
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
 }
