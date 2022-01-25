@@ -13,8 +13,8 @@ import CoreHaptics
 class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynthesizerDelegate {
     @IBOutlet weak var recButton: UIButton!
     @IBOutlet weak var settingsBtn: UIButton!
-//    @IBOutlet weak var searchBar: UISearchBar!
-//    @IBOutlet weak var searchBarPosition: NSLayoutConstraint!
+    //    @IBOutlet weak var searchBar: UISearchBar!
+    //    @IBOutlet weak var searchBarPosition: NSLayoutConstraint!
     @IBOutlet weak var compassImage: UIImageView!
     @IBOutlet weak var floorPlan: UIImageView!
     
@@ -28,6 +28,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     var CURRENT_NODE = -1
     var userAngle : Double = -1
     var atBeaconInstr : [Int : String] = [:]
+    var poiAtCurrentNode : [Int:String] = [:]
     let srVC = SearchResultsVC()
     let narator = AVSpeechSynthesizer()
     var currentlyAt = -1
@@ -41,6 +42,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     var recursionFlag = false
     var indoorWayFindingFlag = false
     var stopRepeatsFlag = true
+    var explorationFlag = true
+    
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,6 +71,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         if let userInputs = UserDefaults.standard.value(forKey: "userInputItems") as? [String : Float]{
             userDefinedRssi = userInputs["Set Threshold"] ?? (-80.00)
         }
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(doubleTapped))
+        tap.numberOfTapsRequired = 2
+        view.addGestureRecognizer(tap)
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
@@ -199,6 +206,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                 speechFlag = true
                 recursionFlag = false
                 indoorWayFindingFlag = true
+                explorationFlag = false
             }
             else{
                 print("User's Angle is still -1")
@@ -217,6 +225,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                     stopRepeatsFlag = true
                 }
             }
+            if explorationFlag{
+                explorationMode(currentNode: CURRENT_NODE)
+            }
         case .near:
             print("Beacon is near: "  + String(describing: beacon!.minor) + " " + String(beacon!.rssi))
             if indoorWayFindingFlag{
@@ -225,9 +236,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                     stopRepeatsFlag = true
                 }
             }
+            if explorationFlag{
+                explorationMode(currentNode: CURRENT_NODE)
+            }
         case .far:
             print("Beacon is Far: "  + String(describing: beacon!.minor) + " " + String(beacon!.rssi))
             // rssi must be less than the set threshold
+            if Float(beacon!.rssi) > userDefinedRssi && explorationFlag{
+                explorationMode(currentNode: CURRENT_NODE)
+            }
             if Float(beacon!.rssi) > userDefinedRssi && indoorWayFindingFlag{
                 if indoorWayFindingFlag{
                     if !checkForReRoute(currNode: CURRENT_NODE){
@@ -306,6 +323,69 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         navigationController?.pushViewController(srVC, animated: true)
     }
     
+    func explorationMode(currentNode : Int){
+        if destinations.isEmpty{
+            return
+        }
+        var POI : [Int] = []
+        var locnames : [String] = []
+        var curNode = -1
+        for i in dArray{
+            if i["beacon_id"] as! Int == CURRENT_NODE{
+                if let checkerForHub = i["locname"] as? String{
+                    if !checkerForHub.contains("Hub "){
+                        let n = i["node"] as! Int
+                        if !POI.contains(n){
+                            POI.append(n)
+                            locnames.append(checkerForHub)
+                        }
+                    }
+                    else{
+                        let n = i["node"] as! Int
+                        curNode = n
+                    }
+                }
+            }
+        }
+        if !POI.isEmpty && userAngle != -1 && curNode != -1{
+            poiAtCurrentNode = generatePOIDirections(POI: POI, angle: userAngle, currentNode: curNode)
+            speechFlag = true
+        }
+        
+        if speechFlag && !recursionFlag{
+            var utterance = AVSpeechUtterance(string: "")
+            let numPOI = POI.count
+            if numPOI > 1{
+                utterance = AVSpeechUtterance(string: "You are near " + String(numPOI) + " points of interest")
+                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+                narator.speak(utterance)
+            }
+            else {
+                utterance = AVSpeechUtterance(string: "You are near " + String(numPOI) + " point of interest")
+                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+                narator.speak(utterance)
+            }
+            
+            for j in POI{
+//                print(POI)
+//                print(locnames)
+//                print(poiAtCurrentNode)
+                let index = POI.firstIndex(of: j)
+                let sentence = locnames[index!] + " is " + poiAtCurrentNode[j]!
+                utterance = AVSpeechUtterance(string: sentence)
+                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+                narator.speak(utterance)
+            }
+            
+            currentlyAt = CURRENT_NODE
+            recursionFlag = true
+            speechFlag = false
+        }
+        if currentlyAt != CURRENT_NODE{
+            recursionFlag = false
+        }
+    }
+    
     func indoorWayFinding(beaconRSSI : Int){
         if speechFlag && !recursionFlag{
             hapticVibration()
@@ -379,6 +459,37 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             try player?.start(atTime: 0)
         } catch {
             print(error.localizedDescription)
+        }
+    }
+    
+    @objc func doubleTapped() {
+        // do something here
+        print("Double Tapped!")
+        if explorationFlag{
+            speechFlag = true
+            recursionFlag = false
+            explorationMode(currentNode: CURRENT_NODE)
+        }
+        if indoorWayFindingFlag{
+            if !stopRepeatsFlag{
+                let utterance = AVSpeechUtterance(string: "Please move closer to a recognizable beacon")
+                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+                narator.speak(utterance)
+            }
+            else{
+                for i in dArray{
+                    if i["beacon_id"] as! Int == CURRENT_NODE{
+                        if let checkerForHub = i["locname"] as? String{
+                            if checkerForHub.contains("Hub "){
+                                let n = i["node"] as! Int
+                                let utterance = AVSpeechUtterance(string: atBeaconInstr[n]!)
+                                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+                                narator.speak(utterance)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
     

@@ -91,6 +91,53 @@ func distCalculator (cost : Int) -> String{
     return distanceDialog
 }
 
+func cardinalDirection(compassIndication : String, userDirection : String) -> String{
+    var guidance : String = "Error"
+    let circle : [String] = ["bnorth", "bneast", "beast", "bseast", "bsouth", "bswest", "bwest", "bnwest"]
+    let compass : [String] = ["N","NE","E","SE","S","SW","W","NW"]
+    let toIndex = circle.firstIndex(of: compassIndication) // Possible index [0 to 7]
+    let fromIndex = circle.firstIndex(of: circle[compass.firstIndex(of: userDirection)!]) // Possible index [0 to 7]
+    let sub = fromIndex! - toIndex!
+    
+    switch(sub){
+        case 0:
+            guidance = "straight ahead"
+        case let n where n == -1 || n == 7:
+            guidance = "slightly right"
+        case let n where n == 1 || n == -7:
+            guidance = "slightly left"
+        case let n where n == -2 || n == 6:
+            guidance = "to your right"
+        case let n where n == 2 || n == -6:
+            guidance = "to your left"
+        case let n where n == 4 || n == -4:
+            guidance = "straight behind"
+        case let n where n == -3 || n == 5:
+            guidance = "at 4 O'Clock"
+        case let n where n == 3 || n == -5:
+            guidance = "at 7 O'Clock"
+        default :
+            guidance = "Error"
+    }
+    
+    return guidance
+}
+
+func generatePOIDirections(POI : [Int], angle : Double, currentNode : Int) -> [Int : String]{
+    let conn = matrixDictionary[currentNode] as! [String:Int]
+    let possibleBeaconLocations = ["bnorth", "bneast", "beast", "bseast", "bsouth", "bswest", "bwest", "bnwest"]
+    var cardinalMatrix : [Int: String] = [:]
+    
+    for i in possibleBeaconLocations{
+        if POI.contains(Int(truncating: conn[i]! as NSNumber)){
+            let k = POI[POI.firstIndex(of: Int(truncating: conn[i]! as NSNumber))!]
+            cardinalMatrix[k] = cardinalDirection(compassIndication: i, userDirection: getDirection(angl: angle))
+        }
+    }
+    
+    return cardinalMatrix
+}
+
 func instructions(path : [Int], angle : Double) -> [Int : String]{
     var atBeaconInstruction : [Int : String] = [:]
     let userDirection = getDirection(angl: angle)
