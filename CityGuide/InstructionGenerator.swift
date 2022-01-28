@@ -8,7 +8,7 @@
 import Foundation
 
 func getDirection(angl : Double) -> String{
-    if (angl < 22.5 && angl >= 337.5){
+    if (angl < 22.5 || angl >= 337.5){
         return "N"
     }
     if (angl >= 22.5 && angl < 67.5){

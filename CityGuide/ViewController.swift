@@ -9,8 +9,9 @@ import UIKit
 import CoreLocation
 import AVFoundation
 import CoreHaptics
+import Speech
 
-class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynthesizerDelegate {
+class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynthesizerDelegate, SFSpeechRecognizerDelegate {
     @IBOutlet weak var recButton: UIButton!
     @IBOutlet weak var settingsBtn: UIButton!
     //    @IBOutlet weak var searchBar: UISearchBar!
@@ -33,6 +34,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     let narator = AVSpeechSynthesizer()
     var currentlyAt = -1
     var engine: CHHapticEngine?
+    let speechRecognizer : SFSpeechRecognizer? = nil
+    var timer : Timer?
     
     //Flags
     var newGroupNoticed = false
@@ -41,15 +44,45 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     var speechFlag = false
     var recursionFlag = false
     var indoorWayFindingFlag = false
+    var isOnRoute = false
     var stopRepeatsFlag = true
     var explorationFlag = true
     
-        
+    @objc func buttonDown(_ sender: UIButton) {
+        singleFire()
+        timer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(rapidFire), userInfo: nil, repeats: true)
+    }
+
+    @objc func buttonUp(_ sender: UIButton) {
+        timer?.invalidate()
+    }
+
+    func singleFire() {
+        print("bang!")
+        // call the record voice function
+    }
+    @objc func rapidFire() {
+        print("bang!")
+        // call the record voice function
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        // To ignore the mute Switch
+        // ====================================================================================
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback,mode: .default)
+
+        } catch let error {
+            print("This error message from SpeechSynthesizer \(error.localizedDescription)")
+        }
+        // ====================================================================================
+        
         narator.delegate = self
+        
+        speechRecognizer?.delegate = self
         
         beaconManager = CLLocationManager()
         beaconManager?.delegate = self
@@ -75,6 +108,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         let tap = UITapGestureRecognizer(target: self, action: #selector(doubleTapped))
         tap.numberOfTapsRequired = 2
         view.addGestureRecognizer(tap)
+        
+        recButton.addTarget(self, action: #selector(buttonDown), for: .touchDown)
+        recButton.addTarget(self, action: #selector(buttonUp), for: [.touchUpInside, .touchUpOutside])
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
@@ -116,6 +152,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                 alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
         }
+    }
+    
+    func recordVoice(){
+        print("Recording in progress...")
     }
     
     func startScanning(){
@@ -254,8 +294,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                 }
             }
             else{
-                if indoorWayFindingFlag && stopRepeatsFlag{
-                    let utterance = AVSpeechUtterance(string: "Please move closer to a recognizable beacon")
+                if indoorWayFindingFlag && stopRepeatsFlag && !isOnRoute{
+                    if narator.isSpeaking{
+                        narator.stopSpeaking(at: AVSpeechBoundary.immediate)
+                    }
+                    let utterance = AVSpeechUtterance(string: "Please move closer to a beacon for directions.")
                     utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
                     narator.speak(utterance)
                     stopRepeatsFlag = false
@@ -327,6 +370,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         if destinations.isEmpty{
             return
         }
+        isOnRoute = false
         var POI : [Int] = []
         var locnames : [String] = []
         var curNode = -1
@@ -353,6 +397,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
         
         if speechFlag && !recursionFlag{
+            if narator.isSpeaking{
+                narator.stopSpeaking(at: AVSpeechBoundary.immediate)
+            }
             var utterance = AVSpeechUtterance(string: "")
             let numPOI = POI.count
             if numPOI > 1{
@@ -387,6 +434,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     }
     
     func indoorWayFinding(beaconRSSI : Int){
+        var exitToExplore = ""
         if speechFlag && !recursionFlag{
             hapticVibration()
             for i in dArray{
@@ -400,10 +448,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                                     indoorWayFindingFlag = false
                                     print("Near Destination")
                                     hapticVibration(atDestination: true)
+                                    explorationFlag = true
+                                    speechFlag = true
+                                    recursionFlag = false
+                                    exitToExplore = "Switching back to Exploration Mode."
+                                }
+                                if narator.isSpeaking{
+                                    narator.stopSpeaking(at: AVSpeechBoundary.immediate)
                                 }
                                 let utterance = AVSpeechUtterance(string: atBeaconInstr[n]!)
                                 utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
                                 narator.speak(utterance)
+                                isOnRoute = true
+                                
+                                if exitToExplore != ""{
+                                    sleep(2)
+                                    let utterance = AVSpeechUtterance(string: exitToExplore)
+                                    utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+                                    narator.speak(utterance)
+                                }
                             }
                         }
                     }
@@ -424,6 +487,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                     if checkerForHub.contains("Hub "){
                         let n = i["node"] as! Int
                         if !shortestPath.contains(n){
+                            if narator.isSpeaking{
+                                narator.stopSpeaking(at: AVSpeechBoundary.immediate)
+                            }
                             let utterance = AVSpeechUtterance(string: "Rerouting")
                             hapticVibration()
                             utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
@@ -495,4 +561,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     
 }
 
+extension SFSpeechRecognizer {
+    static func hasAuthorizationToRecognize() async -> Bool {
+        await withCheckedContinuation { continuation in
+            requestAuthorization { status in
+                continuation.resume(returning: status == .authorized)
+            }
+        }
+    }
+}
 
+extension AVAudioSession {
+    func hasPermissionToRecord() async -> Bool {
+        await withCheckedContinuation { continuation in
+            requestRecordPermission { authorized in
+                continuation.resume(returning: authorized)
+            }
+        }
+    }
+}

@@ -36,6 +36,10 @@
 	<string>Help us navigate by allowing us to view your location</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Help us navigate by allowing us to view your location</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Allow CityGuide to access your microphone to perform voice search functionality</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Allow CityGuide to perform speech recognition for voice search functionality</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
