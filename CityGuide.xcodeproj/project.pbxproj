@@ -7,8 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BD1ED6FC27CD797000B2529D /* LevenshteinDistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD1ED6FB27CD797000B2529D /* LevenshteinDistance.swift */; };
 		BD2020AF26FD6A49005FDE90 /* SettingsTableController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD2020AE26FD6A49005FDE90 /* SettingsTableController.swift */; };
 		BD33706D272DF37A007BBD5E /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD33706C272DF37A007BBD5E /* Database.swift */; };
+		BD35AB7227C04282007ADDF5 /* SpeechRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD35AB7127C04281007ADDF5 /* SpeechRecognizer.swift */; };
 		BD46858C26F1571A00AD1420 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD46858B26F1571A00AD1420 /* AppDelegate.swift */; };
 		BD46858E26F1571A00AD1420 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD46858D26F1571A00AD1420 /* SceneDelegate.swift */; };
 		BD46859026F1571A00AD1420 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD46858F26F1571A00AD1420 /* ViewController.swift */; };
@@ -40,8 +42,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BD1ED6FB27CD797000B2529D /* LevenshteinDistance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevenshteinDistance.swift; sourceTree = "<group>"; };
 		BD2020AE26FD6A49005FDE90 /* SettingsTableController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableController.swift; sourceTree = "<group>"; };
 		BD33706C272DF37A007BBD5E /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
+		BD35AB7127C04281007ADDF5 /* SpeechRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognizer.swift; sourceTree = "<group>"; };
 		BD46858826F1571A00AD1420 /* CityGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CityGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD46858B26F1571A00AD1420 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BD46858D26F1571A00AD1420 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -121,6 +125,8 @@
 				BDCD6BC6271B3E75006524FA /* Routing.swift */,
 				BD33706C272DF37A007BBD5E /* Database.swift */,
 				BD7DABB5274F032800DE62A7 /* SearchResultsVC.swift */,
+				BD35AB7127C04281007ADDF5 /* SpeechRecognizer.swift */,
+				BD1ED6FB27CD797000B2529D /* LevenshteinDistance.swift */,
 			);
 			path = CityGuide;
 			sourceTree = "<group>";
@@ -278,6 +284,8 @@
 				BD46859026F1571A00AD1420 /* ViewController.swift in Sources */,
 				BD2020AF26FD6A49005FDE90 /* SettingsTableController.swift in Sources */,
 				BD46858C26F1571A00AD1420 /* AppDelegate.swift in Sources */,
+				BD35AB7227C04282007ADDF5 /* SpeechRecognizer.swift in Sources */,
+				BD1ED6FC27CD797000B2529D /* LevenshteinDistance.swift in Sources */,
 				BD46858E26F1571A00AD1420 /* SceneDelegate.swift in Sources */,
 				BD81214227977D2400CEE55E /* InstructionGenerator.swift in Sources */,
 				BDCD6BC7271B3E75006524FA /* Routing.swift in Sources */,

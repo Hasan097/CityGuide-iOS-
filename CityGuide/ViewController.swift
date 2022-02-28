@@ -34,8 +34,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     let narator = AVSpeechSynthesizer()
     var currentlyAt = -1
     var engine: CHHapticEngine?
-    let speechRecognizer : SFSpeechRecognizer? = nil
+    var speechRecognizer = SpeechRecognizer()
     var timer : Timer?
+    let group = DispatchGroup()
     
     //Flags
     var newGroupNoticed = false
@@ -47,42 +48,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     var isOnRoute = false
     var stopRepeatsFlag = true
     var explorationFlag = true
+    var userResponse = false
+    var voiceSearchFlag = false
     
     @objc func buttonDown(_ sender: UIButton) {
-        singleFire()
-        timer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(rapidFire), userInfo: nil, repeats: true)
+        singleFire(check: nil)
     }
 
     @objc func buttonUp(_ sender: UIButton) {
         timer?.invalidate()
     }
-
-    func singleFire() {
-        print("bang!")
-        // call the record voice function
-    }
-    @objc func rapidFire() {
-        print("bang!")
-        // call the record voice function
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        
-        // To ignore the mute Switch
-        // ====================================================================================
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback,mode: .default)
-
-        } catch let error {
-            print("This error message from SpeechSynthesizer \(error.localizedDescription)")
-        }
-        // ====================================================================================
-        
         narator.delegate = self
-        
-        speechRecognizer?.delegate = self
         
         beaconManager = CLLocationManager()
         beaconManager?.delegate = self
@@ -152,10 +132,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                 alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: nil))
                 self.present(alert, animated: true, completion: nil)
         }
-    }
-    
-    func recordVoice(){
-        print("Recording in progress...")
     }
     
     func startScanning(){
@@ -231,9 +207,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                         if checkerForHub.contains("Hub "){
                             let n = i["node"] as! Int
                             if n != shortestPath.first!{
-                                let utterance = AVSpeechUtterance(string: "Re-Routing")
-                                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                                narator.speak(utterance)
+                                speakThis(sentence: "Re-Routing")
                                 shortestPath = pathFinder(current: n, destination: shortestPath.last!)
                             }
                         }
@@ -243,10 +217,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             print(shortestPath)
             if userAngle != -1{
                 atBeaconInstr = instructions(path: shortestPath, angle: userAngle)
-                speechFlag = true
-                recursionFlag = false
-                indoorWayFindingFlag = true
-                explorationFlag = false
+                indoorKeyIgnition()
             }
             else{
                 print("User's Angle is still -1")
@@ -295,12 +266,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             }
             else{
                 if indoorWayFindingFlag && stopRepeatsFlag && !isOnRoute{
-                    if narator.isSpeaking{
-                        narator.stopSpeaking(at: AVSpeechBoundary.immediate)
-                    }
-                    let utterance = AVSpeechUtterance(string: "Please move closer to a beacon for directions.")
-                    utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                    narator.speak(utterance)
+                    speakThis(sentence: "Please move closer to a beacon for directions.")
                     stopRepeatsFlag = false
                 }
             }
@@ -316,6 +282,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                 filteredBeacons.append(i)
             }
         }
+        
+//        if beacons.count > 0{
+//            for a in beacons{
+//                if a.rssi < 0{
+//                    print("==> Beacon: " + String(describing: a.minor) + " RSSI: " + String(a.rssi))
+//                }
+//            }
+//        }
 
         if let beacon = filteredBeacons.first{
             updateBeaconReading(distance: beacon.proximity, beacon: beacon)
@@ -396,19 +370,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             speechFlag = true
         }
         
-        if speechFlag && !recursionFlag{
-            if narator.isSpeaking{
-                narator.stopSpeaking(at: AVSpeechBoundary.immediate)
-            }
+        if speechFlag && !recursionFlag && !voiceSearchFlag{
             var utterance = AVSpeechUtterance(string: "")
             let numPOI = POI.count
             if numPOI > 1{
                 utterance = AVSpeechUtterance(string: "You are near " + String(numPOI) + " points of interest")
-                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                narator.speak(utterance)
-            }
-            else {
-                utterance = AVSpeechUtterance(string: "You are near " + String(numPOI) + " point of interest")
                 utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
                 narator.speak(utterance)
             }
@@ -453,19 +419,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                                     recursionFlag = false
                                     exitToExplore = "Switching back to Exploration Mode."
                                 }
-                                if narator.isSpeaking{
-                                    narator.stopSpeaking(at: AVSpeechBoundary.immediate)
-                                }
-                                let utterance = AVSpeechUtterance(string: atBeaconInstr[n]!)
-                                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                                narator.speak(utterance)
+                                speakThis(sentence: atBeaconInstr[n]!)
                                 isOnRoute = true
                                 
                                 if exitToExplore != ""{
                                     sleep(2)
-                                    let utterance = AVSpeechUtterance(string: exitToExplore)
-                                    utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                                    narator.speak(utterance)
+                                    speakThis(sentence: exitToExplore)
                                 }
                             }
                         }
@@ -487,13 +446,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                     if checkerForHub.contains("Hub "){
                         let n = i["node"] as! Int
                         if !shortestPath.contains(n){
-                            if narator.isSpeaking{
-                                narator.stopSpeaking(at: AVSpeechBoundary.immediate)
-                            }
-                            let utterance = AVSpeechUtterance(string: "Rerouting")
+                            speakThis(sentence: "Rerouting")
                             hapticVibration()
-                            utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                            narator.speak(utterance)
                             shortestPath = pathFinder(current: n, destination: shortestPath.last!)
                             return true
                         }
@@ -502,6 +456,163 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             }
         }
         return false
+    }
+    
+    func singleFire(check : Int?){
+        let audioSession = AVAudioSession.sharedInstance()
+        do
+        {
+            try audioSession.setCategory(AVAudioSession.Category.playAndRecord)
+            try audioSession.setMode(AVAudioSession.Mode.default)
+            //try audioSession.setMode(AVAudioSessionModeMeasurement)
+            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+            try AVAudioSession.sharedInstance().overrideOutputAudioPort(AVAudioSession.PortOverride.speaker)
+        }
+        catch
+        {
+            print("audioSession properties weren't set because of an error.")
+        }
+        
+        voiceSearchFlag = true
+        group.enter()
+        if check == 1{
+            DispatchQueue.main.async(group: group){
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                    AudioServicesPlaySystemSound(1113)
+                    self.hapticVibration()
+                    self.speechRecognizer.reset()
+                    self.speechRecognizer.transcribe()
+                    print("Transcription started...")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 4, qos: .default) {
+                        self.speechRecognizer.stopTranscribing()
+                        print("Transcription has stopped...")
+                        print(self.speechRecognizer.transcript)
+                        if(self.speechRecognizer.transcript.lowercased() == "yes" || self.speechRecognizer.transcript.lowercased() == "yup" || self.speechRecognizer.transcript.lowercased() == "confirmed"){
+                            self.userResponse = true
+                        }
+                        self.group.leave()
+                    }
+                }
+            }
+        }
+        else{
+            speakThis(sentence: "Please say your destination after the indication.")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                AudioServicesPlaySystemSound(1113)
+                self.hapticVibration()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6){
+                    self.speechRecognizer.reset()
+                    self.speechRecognizer.transcribe()
+                    print("Transcription started...")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, qos: .default) {
+                        self.speechRecognizer.stopTranscribing()
+                        print("Transcription has stopped...")
+                        print(self.speechRecognizer.transcript)
+                        self.checkForDistination(userDes: self.speechRecognizer.transcript)
+                        self.group.leave()
+                    }
+                }
+            }
+        }
+    }
+    
+    func checkForDistination(userDes : String){
+        var dest = ""
+        var range = 0
+        var similarToDest = ""
+        for k in destinations{
+            var testRange = 0
+            if k.lowercased() == userDes.lowercased(){
+                dest = k
+                break
+            }
+            else{
+                let words : [String] = userDes.lowercased().components(separatedBy: " ")
+                let destWords : [String] = k.lowercased().components(separatedBy: " ")
+                for v in words{
+                    if destWords.contains(v){
+                        testRange += 1
+                    }
+                    else{
+                        for o in destWords{
+                            let check = levenshtein(aStr: v, bStr: o)
+                            if(check <= 2){
+                                testRange += 1
+                            }
+                        }
+                    }
+                }
+                if range < testRange{
+                    range = testRange
+                    similarToDest = k
+                }
+            }
+        }
+        
+        if similarToDest != ""{
+            speakThis(sentence: "Did you mean " + similarToDest + "? Please confirm or say no after the indication.")
+            singleFire(check: 1)            // here is the problem
+            group.notify(queue: .main){
+                if self.userResponse{
+                    dest = similarToDest
+                }
+                else{
+                    self.speakThis(sentence: "Search cancelled.")
+                    self.voiceSearchFlag = false
+                    return
+                }
+                var currNode = -1
+                for i in dArray{
+                    if i["beacon_id"] as! Int == self.CURRENT_NODE{
+                        if let checkerForHub = i["locname"] as? String{
+                            if checkerForHub.contains("Hub "){
+                                currNode = i["node"] as! Int
+                            }
+                        }
+                    }
+                }
+                for i in dArray{
+                    if i["locname"] as? String == dest && currNode != -1{
+                        let desNode = Int(truncating: i["node"] as! NSNumber)
+                        self.indoorKeyIgnition()
+                        self.voiceSearchFlag = false
+                        shortestPath = pathFinder(current: currNode, destination: desNode)
+                    }
+                }
+            }
+        }
+        else if dest != ""{
+            var currNode = -1
+            for i in dArray{
+                if i["beacon_id"] as! Int == self.CURRENT_NODE{
+                    if let checkerForHub = i["locname"] as? String{
+                        if checkerForHub.contains("Hub "){
+                            currNode = i["node"] as! Int
+                        }
+                    }
+                }
+            }
+            for i in dArray{
+                if i["locname"] as? String == dest && currNode != -1{
+                    let desNode = Int(truncating: i["node"] as! NSNumber)
+                    self.indoorKeyIgnition()
+                    self.voiceSearchFlag = false
+                    shortestPath = pathFinder(current: currNode, destination: desNode)
+                }
+            }
+        }
+        else{
+            self.speakThis(sentence: "Sorry, no destination was found.")
+            self.voiceSearchFlag = false
+            return
+        }
+    }
+    
+    func indoorKeyIgnition(){
+        speechFlag = true
+        recursionFlag = false
+        indoorWayFindingFlag = true
+        explorationFlag = false
     }
     
     func hapticVibration(atDestination : Bool? = false){
@@ -528,6 +639,32 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
     }
     
+    func speakThis(sentence : String){
+        let audioSession = AVAudioSession.sharedInstance()
+        do
+        {
+            try audioSession.setCategory(AVAudioSession.Category.playAndRecord)
+            try audioSession.setMode(AVAudioSession.Mode.default)
+            //try audioSession.setMode(AVAudioSessionModeMeasurement)
+            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+            try AVAudioSession.sharedInstance().overrideOutputAudioPort(AVAudioSession.PortOverride.speaker)
+        }
+        catch
+        {
+            print("audioSession properties weren't set because of an error.")
+        }
+        let utterance = AVSpeechUtterance(string: sentence)
+        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        if(narator.isSpeaking && indoorWayFindingFlag){
+            narator.stopSpeaking(at: .immediate)
+        }
+        if(narator.isSpeaking && explorationFlag && voiceSearchFlag){
+            narator.stopSpeaking(at: .word)
+        }
+        
+        narator.speak(utterance)
+    }
+    
     @objc func doubleTapped() {
         // do something here
         print("Double Tapped!")
@@ -538,9 +675,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
         if indoorWayFindingFlag{
             if !stopRepeatsFlag{
-                let utterance = AVSpeechUtterance(string: "Please move closer to a recognizable beacon")
-                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                narator.speak(utterance)
+                speakThis(sentence: "Please move closer to a recognizable beacon")
             }
             else{
                 for i in dArray{
@@ -548,34 +683,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                         if let checkerForHub = i["locname"] as? String{
                             if checkerForHub.contains("Hub "){
                                 let n = i["node"] as! Int
-                                let utterance = AVSpeechUtterance(string: atBeaconInstr[n]!)
-                                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                                narator.speak(utterance)
+                                speakThis(sentence: atBeaconInstr[n]!)
                             }
                         }
                     }
                 }
-            }
-        }
-    }
-    
-}
-
-extension SFSpeechRecognizer {
-    static func hasAuthorizationToRecognize() async -> Bool {
-        await withCheckedContinuation { continuation in
-            requestAuthorization { status in
-                continuation.resume(returning: status == .authorized)
-            }
-        }
-    }
-}
-
-extension AVAudioSession {
-    func hasPermissionToRecord() async -> Bool {
-        await withCheckedContinuation { continuation in
-            requestRecordPermission { authorized in
-                continuation.resume(returning: authorized)
             }
         }
     }
