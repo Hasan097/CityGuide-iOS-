@@ -81,12 +81,28 @@
                                     <action selector="searchTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="JuM-v7-LxW"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nao-yv-DVP" userLabel="Stop Button">
+                                <rect key="frame" x="345" y="631" width="51" height="46"/>
+                                <color key="backgroundColor" systemColor="systemYellowColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="46" id="9RT-Oa-OCa"/>
+                                    <constraint firstAttribute="width" constant="51" id="dFV-RB-NtV"/>
+                                </constraints>
+                                <color key="tintColor" systemColor="labelColor"/>
+                                <state key="normal">
+                                    <imageReference key="image" image="xmark" catalog="system" symbolScale="large" renderingMode="template"/>
+                                </state>
+                                <connections>
+                                    <action selector="didTapStop:" destination="BYZ-38-t0r" eventType="touchUpInside" id="tlV-Pn-VZY"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemYellowColor"/>
                         <constraints>
                             <constraint firstItem="Zlr-EM-oVJ" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="0KF-gh-xWZ"/>
                             <constraint firstItem="hg5-Mn-mht" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="1Zt-uo-h0c"/>
+                            <constraint firstItem="nao-yv-DVP" firstAttribute="leading" secondItem="Ph9-rv-IAX" secondAttribute="leading" id="B4W-h0-1dc"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="nVd-na-qpp" secondAttribute="trailing" constant="20" id="GLf-HQ-ZIB"/>
                             <constraint firstItem="Ph9-rv-IAX" firstAttribute="leading" secondItem="Zlr-EM-oVJ" secondAttribute="trailing" constant="93" id="GZg-Wd-9HN"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="Ph9-rv-IAX" secondAttribute="bottom" constant="76" id="eVx-XY-vOc"/>
@@ -95,6 +111,7 @@
                             <constraint firstItem="nVd-na-qpp" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="sKI-cJ-sQA"/>
                             <constraint firstItem="hg5-Mn-mht" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="tR8-yT-oFJ"/>
                             <constraint firstItem="Zlr-EM-oVJ" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="tS2-hI-PFc"/>
+                            <constraint firstItem="Ph9-rv-IAX" firstAttribute="top" secondItem="nao-yv-DVP" secondAttribute="bottom" constant="63" id="u1j-Wi-hCR"/>
                             <constraint firstAttribute="bottom" secondItem="hg5-Mn-mht" secondAttribute="bottom" constant="20" symbolic="YES" id="vHg-uM-JHQ"/>
                             <constraint firstItem="Zlr-EM-oVJ" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="z6J-S0-uCu"/>
                         </constraints>
@@ -104,6 +121,7 @@
                         <outlet property="compassImage" destination="Zlr-EM-oVJ" id="Lso-Eq-2Lk"/>
                         <outlet property="floorPlan" destination="ST7-QY-u1R" id="JCe-rz-iI5"/>
                         <outlet property="recButton" destination="oYs-sI-Dl3" id="6Sh-aX-sGt"/>
+                        <outlet property="stopBtn" destination="nao-yv-DVP" id="lbs-gZ-PYF"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -176,6 +194,7 @@
         <image name="isometricGrid" width="500" height="481"/>
         <image name="magnifyingglass" catalog="system" width="128" height="115"/>
         <image name="mic" catalog="system" width="108" height="128"/>
+        <image name="xmark" catalog="system" width="128" height="113"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

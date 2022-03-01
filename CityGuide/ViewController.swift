@@ -14,6 +14,7 @@ import Speech
 class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynthesizerDelegate, SFSpeechRecognizerDelegate {
     @IBOutlet weak var recButton: UIButton!
     @IBOutlet weak var settingsBtn: UIButton!
+    @IBOutlet weak var stopBtn: UIButton!
     //    @IBOutlet weak var searchBar: UISearchBar!
     //    @IBOutlet weak var searchBarPosition: NSLayoutConstraint!
     @IBOutlet weak var compassImage: UIImageView!
@@ -91,6 +92,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         
         recButton.addTarget(self, action: #selector(buttonDown), for: .touchDown)
         recButton.addTarget(self, action: #selector(buttonUp), for: [.touchUpInside, .touchUpOutside])
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        stopBtn.isHidden = true
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
@@ -266,6 +271,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             }
             else{
                 if indoorWayFindingFlag && stopRepeatsFlag && !isOnRoute{
+                    if(stopBtn.isHidden){
+                        stopBtn.isHidden = false
+                    }
                     speakThis(sentence: "Please move closer to a beacon for directions.")
                     stopRepeatsFlag = false
                 }
@@ -303,6 +311,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         self.present(alert, animated: true, completion: nil)
     }
 
+    @IBAction func didTapStop(_ sender: Any) {
+        indoorWayFindingFlag = false
+        hapticVibration(atDestination: true)
+        explorationFlag = true
+        speechFlag = true
+        recursionFlag = false
+        stopBtn.isHidden = true
+        speakThis(sentence: "Routing stopped. Switching to exploration mode.")
+    }
     @IBAction func didTapSettingsButton(){
         let tvc = SettingsTableController()
         tvc.items = [
@@ -400,6 +417,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     }
     
     func indoorWayFinding(beaconRSSI : Int){
+        if stopBtn.isHidden{
+            stopBtn.isHidden = false
+        }
         var exitToExplore = ""
         if speechFlag && !recursionFlag{
             hapticVibration()
@@ -417,6 +437,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                                     explorationFlag = true
                                     speechFlag = true
                                     recursionFlag = false
+                                    stopBtn.isHidden = true
                                     exitToExplore = "Switching back to Exploration Mode."
                                 }
                                 speakThis(sentence: atBeaconInstr[n]!)
