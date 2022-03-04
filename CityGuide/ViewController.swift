@@ -388,12 +388,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
         
         if speechFlag && !recursionFlag && !voiceSearchFlag{
-            var utterance = AVSpeechUtterance(string: "")
             let numPOI = POI.count
             if numPOI > 1{
-                utterance = AVSpeechUtterance(string: "You are near " + String(numPOI) + " points of interest")
-                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                narator.speak(utterance)
+                speakThis(sentence: "You are near " + String(numPOI) + " points of interest")
             }
             
             for j in POI{
@@ -402,9 +399,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
 //                print(poiAtCurrentNode)
                 let index = POI.firstIndex(of: j)
                 let sentence = locnames[index!] + " is " + poiAtCurrentNode[j]!
-                utterance = AVSpeechUtterance(string: sentence)
-                utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-                narator.speak(utterance)
+                speakThis(sentence: sentence)
             }
             
             currentlyAt = CURRENT_NODE
