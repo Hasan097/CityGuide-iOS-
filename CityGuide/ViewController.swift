@@ -204,15 +204,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         //do nothing here
     }
     
+    // Screening window code and functions
+    // ===================================
     func checkWindow(){
         var maxNumOfDetection = 0;
-//        print("==================================")
+        print("==================================")
         for i in window.keys{
-//            print(String(i), terminator: ": ")
-//            print(window[i]!)
+            print(String(i), terminator: ": ")
+            print(window[i]!)
             maxNumOfDetection+=1
         }
-//        print("==================================")
+        print("==================================")
         if(maxNumOfDetection > 5){
             for i in window.keys{
                 let checker = window[i]!.count;
@@ -259,9 +261,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         if FARTHEST_NODE != -1 && CURRENT_NODE != FARTHEST_NODE{
             window.removeValue(forKey: FARTHEST_NODE)
         }
-//        print("Closest Beacon : " + String(CURRENT_NODE) + " Rssi : " + String(CLOSEST_RSSI))
+        print("Closest Beacon : " + String(CURRENT_NODE) + " Rssi : " + String(CLOSEST_RSSI))
 //        print("Farthest Beacon : " + String(farthestBeacon) + " Rssi : " + String(farthestRssi))
     }
+    // ===================================
+    
     
     func updateBeaconReading(distance : Double, beacon: Int){
         
