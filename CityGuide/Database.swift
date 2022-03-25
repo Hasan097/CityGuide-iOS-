@@ -38,7 +38,7 @@ var beaconData : [String:Any] = [  // A default beacon information template
 var dArray : [[String:Any]] = []  // The array containting values of a cluster of beacons
 var destinations : [String] = []
 var listOfBecaon : [Int] = []
-var imageView : UIImageView = UIImageView()
+var image : UIImage? = nil
 
 func postToDB(typeOfAction: String, beaconID: Int, auth: String, floorNum: Int?, vc : UIViewController){
     switch typeOfAction{
@@ -104,7 +104,7 @@ func postToDB(typeOfAction: String, beaconID: Int, auth: String, floorNum: Int?,
                             if data != nil{
                                 // Here we expect a file with all the beacon numbers in it associated to the groupID
                                 DispatchQueue.main.sync {
-                                    imageView.image = UIImage(data: data!)
+                                    image = UIImage(data: data!)
                                 }
                             }
                         } catch {

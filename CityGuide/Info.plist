@@ -30,6 +30,10 @@
 			<string></string>
 		</dict>
 	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>We require the use of Bluetooth to connect to beacons for path finding</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>We require the use of Bluetooth Peripheral Usage for path finding</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Help us navigate by allowing us to view your location</string>
 	<key>NSLocationUsageDescription</key>
@@ -72,15 +76,11 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 </dict>
 </plist>

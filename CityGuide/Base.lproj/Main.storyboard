@@ -96,6 +96,18 @@
                                     <action selector="didTapStop:" destination="BYZ-38-t0r" eventType="touchUpInside" id="tlV-Pn-VZY"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WGA-WC-rXC" userLabel="Mute Narator">
+                                <rect key="frame" x="19" y="108" width="51" height="46"/>
+                                <color key="backgroundColor" systemColor="systemYellowColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="51" id="kck-4a-dM3"/>
+                                    <constraint firstAttribute="height" constant="46" id="uTn-g5-CWM"/>
+                                </constraints>
+                                <color key="tintColor" systemColor="labelColor"/>
+                                <connections>
+                                    <action selector="switchMuteTo:" destination="BYZ-38-t0r" eventType="touchUpInside" id="e7H-cx-AOE"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemYellowColor"/>
@@ -105,9 +117,11 @@
                             <constraint firstItem="nao-yv-DVP" firstAttribute="leading" secondItem="Ph9-rv-IAX" secondAttribute="leading" id="B4W-h0-1dc"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="nVd-na-qpp" secondAttribute="trailing" constant="20" id="GLf-HQ-ZIB"/>
                             <constraint firstItem="Ph9-rv-IAX" firstAttribute="leading" secondItem="Zlr-EM-oVJ" secondAttribute="trailing" constant="93" id="GZg-Wd-9HN"/>
+                            <constraint firstItem="WGA-WC-rXC" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="19" id="KEv-MZ-6RE"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="Ph9-rv-IAX" secondAttribute="bottom" constant="76" id="eVx-XY-vOc"/>
                             <constraint firstItem="Zlr-EM-oVJ" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="260" id="gpW-Ku-LId"/>
                             <constraint firstAttribute="trailing" secondItem="hg5-Mn-mht" secondAttribute="trailing" id="kiz-Rs-b6O"/>
+                            <constraint firstItem="WGA-WC-rXC" firstAttribute="top" secondItem="nVd-na-qpp" secondAttribute="bottom" constant="-46" id="lol-yE-jdA"/>
                             <constraint firstItem="nVd-na-qpp" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="sKI-cJ-sQA"/>
                             <constraint firstItem="hg5-Mn-mht" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="tR8-yT-oFJ"/>
                             <constraint firstItem="Zlr-EM-oVJ" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="tS2-hI-PFc"/>
@@ -120,6 +134,7 @@
                     <connections>
                         <outlet property="compassImage" destination="Zlr-EM-oVJ" id="Lso-Eq-2Lk"/>
                         <outlet property="floorPlan" destination="ST7-QY-u1R" id="JCe-rz-iI5"/>
+                        <outlet property="naratorMute" destination="WGA-WC-rXC" id="gFd-Je-K8e"/>
                         <outlet property="recButton" destination="oYs-sI-Dl3" id="6Sh-aX-sGt"/>
                         <outlet property="stopBtn" destination="nao-yv-DVP" id="lbs-gZ-PYF"/>
                     </connections>

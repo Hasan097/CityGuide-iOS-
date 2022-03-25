@@ -82,7 +82,7 @@ func distCalculator (cost : Int) -> String{
         //feet
         var toFeet = Double(cost) * 3.28
         toFeet = Double(round(100 * toFeet) / 100)
-        distanceDialog = (String(toFeet) + " feet")
+        distanceDialog = (String(Int(toFeet)) + " feet")
     }
     else {
         //error

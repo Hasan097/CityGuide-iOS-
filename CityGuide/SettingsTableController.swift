@@ -60,6 +60,7 @@ class SettingsTableController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        overrideUserInterfaceStyle = .light
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
         

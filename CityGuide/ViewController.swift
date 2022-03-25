@@ -11,7 +11,9 @@ import AVFoundation
 import CoreHaptics
 import Speech
 
-class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynthesizerDelegate, SFSpeechRecognizerDelegate {
+class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynthesizerDelegate, SFSpeechRecognizerDelegate, BeaconScannerDelegate {
+    
+    @IBOutlet weak var naratorMute: UIButton!
     @IBOutlet weak var recButton: UIButton!
     @IBOutlet weak var settingsBtn: UIButton!
     @IBOutlet weak var stopBtn: UIButton!
@@ -20,6 +22,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     @IBOutlet weak var compassImage: UIImageView!
     @IBOutlet weak var floorPlan: UIImageView!
     
+    var beaconScanner: BeaconScanner!
     var beaconManager : CLLocationManager?
     var locationManager : CLLocationManager?
     var userDefinedRssi: Float = 0.0
@@ -28,6 +31,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     var groupID : Int = -1
     var floorNo : Int = -10
     var CURRENT_NODE = -1
+    var CLOSEST_RSSI = -100000.0
+    var FARTHEST_NODE = -1
     var userAngle : Double = -1
     var atBeaconInstr : [Int : String] = [:]
     var poiAtCurrentNode : [Int:String] = [:]
@@ -37,6 +42,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     var engine: CHHapticEngine?
     var speechRecognizer = SpeechRecognizer()
     var timer : Timer?
+    var window : [Int : [Int]] = [:]
     let group = DispatchGroup()
     
     //Flags
@@ -51,6 +57,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     var explorationFlag = true
     var userResponse = false
     var voiceSearchFlag = false
+    var muteFlag = false
     
     @objc func buttonDown(_ sender: UIButton) {
         singleFire(check: nil)
@@ -65,9 +72,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         // Do any additional setup after loading the view.
         narator.delegate = self
         
-        beaconManager = CLLocationManager()
-        beaconManager?.delegate = self
-        beaconManager?.requestAlwaysAuthorization()
+//        beaconManager = CLLocationManager()
+//        beaconManager?.delegate = self
+//        beaconManager?.requestAlwaysAuthorization()
         
         locationManager = CLLocationManager()
         locationManager?.delegate = self
@@ -92,6 +99,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         
         recButton.addTarget(self, action: #selector(buttonDown), for: .touchDown)
         recButton.addTarget(self, action: #selector(buttonUp), for: [.touchUpInside, .touchUpOutside])
+        
+        self.beaconScanner = BeaconScanner()
+        self.beaconScanner!.delegate = self
+        self.beaconScanner!.startScanning()
+        
+        self.naratorMute.setImage(UIImage(systemName: "volume.fill"), for: .normal)
+        self.naratorMute.tintColor = .black
+        self.recButton.tintColor = .black
+        self.stopBtn.tintColor = .black
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -111,50 +127,148 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
     }
     
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        switch manager.authorizationStatus{
-            case .authorizedAlways, .authorizedWhenInUse:
-                print("Authorized")
-                if CLLocationManager.isMonitoringAvailable(for: CLBeaconRegion.self){
-                    if CLLocationManager.isRangingAvailable(){
-                        startScanning()
-                    }
+//    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+//        switch manager.authorizationStatus{
+//            case .authorizedAlways, .authorizedWhenInUse:
+//                print("Authorized")
+//                if CLLocationManager.isMonitoringAvailable(for: CLBeaconRegion.self){
+//                    if CLLocationManager.isRangingAvailable(){
+//                        startScanning()
+//                    }
+//                }
+//            case .notDetermined:
+//                let alert = UIAlertController.init(title: "Cannot Find Beacons", message: "Permissions were undetermined.", preferredStyle: .alert)
+//                alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: nil))
+//                self.present(alert, animated: true, completion: nil)
+//            case .restricted:
+//                let alert = UIAlertController.init(title: "Cannot Find Beacons", message: "Permissions were restricted.", preferredStyle: .alert)
+//                alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: nil))
+//                self.present(alert, animated: true, completion: nil)
+//            case .denied:
+//                let alert = UIAlertController.init(title: "Cannot Find Beacons", message: "Permissions were denied.", preferredStyle: .alert)
+//                alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: nil))
+//                self.present(alert, animated: true, completion: nil)
+//            @unknown default:
+//                let alert = UIAlertController.init(title: "Cannot Find Beacons", message: "Permissions were denied.", preferredStyle: .alert)
+//                alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: nil))
+//                self.present(alert, animated: true, completion: nil)
+//        }
+//    }
+    
+//    func startScanning(){
+//        let uuid = UUID.init(uuidString: "CA1D78EA-BE1A-4580-8D87-1F60B67A80AB")!
+//        let beaconRegion = CLBeaconRegion.init(uuid: uuid, major: 0, identifier: "Gimbal Beacon")
+//        let beconIdConstraint = CLBeaconIdentityConstraint.init(uuid: uuid)
+//        beaconManager?.startMonitoring(for: beaconRegion)
+//        beaconManager?.startRangingBeacons(satisfying: beconIdConstraint)
+//    }
+    //
+    
+    func didFindBeacon(beaconScanner: BeaconScanner, beaconInfo: BeaconInfo) {
+        //NSLog("FIND: %@", beaconInfo.description)
+      }
+    func didLoseBeacon(beaconScanner: BeaconScanner, beaconInfo: BeaconInfo) {
+        //NSLog("LOST: %@", beaconInfo.description)
+    }
+    func didUpdateBeacon(beaconScanner: BeaconScanner, beaconInfo: BeaconInfo) {
+        //NSLog("UPDATE: %@", beaconInfo.description)
+        //beaconInfo.beaconID.bID
+        //beaconInfo.RSSI
+        var defaultRssi : Float = -1000.0
+        if let userInputs = UserDefaults.standard.value(forKey: "userInputItems") as? [String : Float]{
+            let userRssi = userInputs["Set Threshold"] ?? (-80.00)
+            defaultRssi = userRssi
+            if(beaconInfo.RSSI >= Int(userRssi) && beaconInfo.RSSI < -45){
+                if(window[beaconInfo.beaconID.bID] == nil){
+                    let arr = [beaconInfo.RSSI]
+                    window[beaconInfo.beaconID.bID] = arr
                 }
-            case .notDetermined:
-                let alert = UIAlertController.init(title: "Cannot Find Beacons", message: "Permissions were undetermined.", preferredStyle: .alert)
-                alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: nil))
-                self.present(alert, animated: true, completion: nil)
-            case .restricted:
-                let alert = UIAlertController.init(title: "Cannot Find Beacons", message: "Permissions were restricted.", preferredStyle: .alert)
-                alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: nil))
-                self.present(alert, animated: true, completion: nil)
-            case .denied:
-                let alert = UIAlertController.init(title: "Cannot Find Beacons", message: "Permissions were denied.", preferredStyle: .alert)
-                alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: nil))
-                self.present(alert, animated: true, completion: nil)
-            @unknown default:
-                let alert = UIAlertController.init(title: "Cannot Find Beacons", message: "Permissions were denied.", preferredStyle: .alert)
-                alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: nil))
-                self.present(alert, animated: true, completion: nil)
+                else{
+                    var arr = window[beaconInfo.beaconID.bID]
+                    if arr!.count >= 4{
+                        arr?.remove(at: 0)
+                    }
+                    arr?.append(beaconInfo.RSSI)
+                    window[beaconInfo.beaconID.bID] = arr
+                }
+            }
+        }
+        
+        checkWindow()
+        
+        if(CURRENT_NODE != -1 && CLOSEST_RSSI > Double(defaultRssi)){
+            updateBeaconReading(distance: CLOSEST_RSSI, beacon: CURRENT_NODE)
         }
     }
-    
-    func startScanning(){
-        let uuid = UUID.init(uuidString: "CA1D78EA-BE1A-4580-8D87-1F60B67A80AB")!
-        let beaconRegion = CLBeaconRegion.init(uuid: uuid, major: 0, identifier: "Gimbal Beacon")
-        let beconIdConstraint = CLBeaconIdentityConstraint.init(uuid: uuid)
-        beaconManager?.startMonitoring(for: beaconRegion)
-        beaconManager?.startRangingBeacons(satisfying: beconIdConstraint)
+    func didObserveURLBeacon(beaconScanner: BeaconScanner, URL: NSURL, RSSI: Int) {
+        //do nothing here
     }
     
-    func updateBeaconReading(distance : CLProximity, beacon: CLBeacon?){
+    func checkWindow(){
+        var maxNumOfDetection = 0;
+//        print("==================================")
+        for i in window.keys{
+//            print(String(i), terminator: ": ")
+//            print(window[i]!)
+            maxNumOfDetection+=1
+        }
+//        print("==================================")
+        if(maxNumOfDetection > 5){
+            for i in window.keys{
+                let checker = window[i]!.count;
+                if checker < 2{
+                    window.removeValue(forKey: i)
+                }
+            }
+            maxNumOfDetection = 0
+        }
+        screeningWindow()
+    }
+    
+    func screeningWindow(){
+        var closestRssi = -100000.0
+        var closestBeacon = 0
+        var farthestBeacon = 0
+        var farthestRssi = 100000.0
+        for i in window.keys{
+            let arr = window[i]
+            let denominator = arr?.count
+            var numerator = 0
+            if(denominator == 4){
+                for vector in arr!{
+                    numerator = numerator + (-1 * vector)
+                }
+                let temp = closestRssi
+                let far = farthestRssi
+                closestRssi = max(closestRssi, -1.0 * Double(numerator / denominator!))
+                farthestRssi = min(farthestRssi, -1.0 * Double(numerator / denominator!))
+                if closestRssi != temp{
+                    closestBeacon = i
+                }
+                if farthestRssi != far{
+                    farthestBeacon = i
+                }
+            }
+        }
         
-        if beacon?.minor != nil{
-            CURRENT_NODE = Int(truncating: beacon!.minor as NSNumber)
-            if beaconList.contains(Int(truncating: beacon!.minor)) == false{
-                let beaconID = Int(truncating: beacon!.minor)
-                beaconList.append(beaconID)
-                postToDB(typeOfAction: "beacons", beaconID: beaconID, auth: "eW7jYaEz7mnx0rrM", floorNum: nil, vc: self)
+        if(closestBeacon != 0){
+            CURRENT_NODE = closestBeacon
+            CLOSEST_RSSI = closestRssi
+            FARTHEST_NODE = farthestBeacon
+        }
+        if FARTHEST_NODE != -1 && CURRENT_NODE != FARTHEST_NODE{
+            window.removeValue(forKey: FARTHEST_NODE)
+        }
+//        print("Closest Beacon : " + String(CURRENT_NODE) + " Rssi : " + String(CLOSEST_RSSI))
+//        print("Farthest Beacon : " + String(farthestBeacon) + " Rssi : " + String(farthestRssi))
+    }
+    
+    func updateBeaconReading(distance : Double, beacon: Int){
+        
+        if beacon != -1{
+            if beaconList.contains(beacon) == false{
+                beaconList.append(beacon)
+                postToDB(typeOfAction: "beacons", beaconID: beacon, auth: "eW7jYaEz7mnx0rrM", floorNum: nil, vc: self)
             }
         }
         
@@ -178,8 +292,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             }
         }
         
-        if imageView.image != nil && floorPlan.image != imageView.image{
-            self.floorPlan.image = imageView.image
+        DispatchQueue.main.async {
+            if image != nil && self.floorPlan.image != image{
+                self.floorPlan.image = image
+            }
         }
         
         if groupID != -1 && newGroupNoticed && floorNo != -10{
@@ -230,66 +346,34 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             pathFound = false
         }
         
-        switch distance {
-        case .unknown:
-            print("No Beacons Detected: ")
-        case .immediate:
-            print("Beacon is very close: " + String(describing: beacon!.minor) + " " + String(beacon!.rssi))
-            if indoorWayFindingFlag{
-                if !checkForReRoute(currNode: CURRENT_NODE){
-                    indoorWayFinding(beaconRSSI: beacon!.rssi)
-                    stopRepeatsFlag = true
+//            print("Beacon: " + String(describing: beacon) + " " + String(distance))
+        if distance > Double(userDefinedRssi) && explorationFlag && !indoorWayFindingFlag{
+            explorationMode(currentNode: CURRENT_NODE)
+        }
+        if distance > Double(userDefinedRssi) && indoorWayFindingFlag{
+            if !self.checkForReRoute(currNode: self.CURRENT_NODE){
+                self.indoorWayFinding(beaconRSSI: Float(distance))
+                self.stopRepeatsFlag = true
+            }
+        }
+        else{
+            if indoorWayFindingFlag && stopRepeatsFlag && !isOnRoute{
+                if(stopBtn.isHidden){
+                    stopBtn.isHidden = false
                 }
+                speakThis(sentence: "Please move closer to a beacon for directions.")
+                stopRepeatsFlag = false
             }
-            if explorationFlag{
-                explorationMode(currentNode: CURRENT_NODE)
-            }
-        case .near:
-            print("Beacon is near: "  + String(describing: beacon!.minor) + " " + String(beacon!.rssi))
-            if indoorWayFindingFlag{
-                if !checkForReRoute(currNode: CURRENT_NODE){
-                    indoorWayFinding(beaconRSSI: beacon!.rssi)
-                    stopRepeatsFlag = true
-                }
-            }
-            if explorationFlag{
-                explorationMode(currentNode: CURRENT_NODE)
-            }
-        case .far:
-            print("Beacon is Far: "  + String(describing: beacon!.minor) + " " + String(beacon!.rssi))
-            // rssi must be less than the set threshold
-            if Float(beacon!.rssi) > userDefinedRssi && explorationFlag{
-                explorationMode(currentNode: CURRENT_NODE)
-            }
-            if Float(beacon!.rssi) > userDefinedRssi && indoorWayFindingFlag{
-                if indoorWayFindingFlag{
-                    if !checkForReRoute(currNode: CURRENT_NODE){
-                        indoorWayFinding(beaconRSSI: beacon!.rssi)
-                        stopRepeatsFlag = true
-                    }
-                }
-            }
-            else{
-                if indoorWayFindingFlag && stopRepeatsFlag && !isOnRoute{
-                    if(stopBtn.isHidden){
-                        stopBtn.isHidden = false
-                    }
-                    speakThis(sentence: "Please move closer to a beacon for directions.")
-                    stopRepeatsFlag = false
-                }
-            }
-        @unknown default:
-            print("No Beacons Detected (Default)")
         }
     }
     
-    func locationManager(_ manager: CLLocationManager, didRange beacons: [CLBeacon], satisfying beaconConstraint: CLBeaconIdentityConstraint) {
-        var filteredBeacons : [CLBeacon] = []
-        for i in beacons{
-            if i.rssi != 0{
-                filteredBeacons.append(i)
-            }
-        }
+//    func locationManager(_ manager: CLLocationManager, didRange beacons: [CLBeacon], satisfying beaconConstraint: CLBeaconIdentityConstraint) {
+//        var filteredBeacons : [CLBeacon] = []
+//        for i in beacons{
+//            if i.rssi != 0{
+//                filteredBeacons.append(i)
+//            }
+//        }
         
 //        if beacons.count > 0{
 //            for a in beacons{
@@ -299,13 +383,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
 //            }
 //        }
 
-        if let beacon = filteredBeacons.first{
-            updateBeaconReading(distance: beacon.proximity, beacon: beacon)
-        }
-        else{
-            updateBeaconReading(distance: .unknown, beacon: nil)
-        }
-    }
+//        if let beacon = filteredBeacons.first{
+//            updateBeaconReading(distance: beacon.proximity, beacon: beacon)
+//        }
+//        else{
+//            updateBeaconReading(distance: .unknown, beacon: nil)
+//        }
+//    }
     
     func presentAlert(alert : UIAlertController){
         self.present(alert, animated: true, completion: nil)
@@ -387,8 +471,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             speechFlag = true
         }
         
-        if speechFlag && !recursionFlag && !voiceSearchFlag{
+        if speechFlag && !recursionFlag && !voiceSearchFlag && !muteFlag{
             let numPOI = POI.count
+            if(narator.isSpeaking){
+                narator.stopSpeaking(at: .immediate)
+            }
             if numPOI > 1{
                 speakThis(sentence: "You are near " + String(numPOI) + " points of interest")
             }
@@ -411,9 +498,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
     }
     
-    func indoorWayFinding(beaconRSSI : Int){
-        if stopBtn.isHidden{
-            stopBtn.isHidden = false
+    func indoorWayFinding(beaconRSSI : Float){
+        DispatchQueue.main.async {
+            if self.stopBtn.isHidden{
+                    self.stopBtn.isHidden = false
+            }
         }
         var exitToExplore = ""
         if speechFlag && !recursionFlag{
@@ -424,7 +513,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                         if checkerForHub.contains("Hub "){
                             let n = i["node"] as! Int
                             let validRSSI = i["threshold"] as! Float
-                            if Float(beaconRSSI) < validRSSI{     // Check if within RSSI range set by server entry
+                            if beaconRSSI < validRSSI{     // Check if within RSSI range set by server entry
                                 if atBeaconInstr[n]!.contains("destination."){
                                     indoorWayFindingFlag = false
                                     print("Near Destination")
@@ -432,16 +521,38 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                                     explorationFlag = true
                                     speechFlag = true
                                     recursionFlag = false
-                                    stopBtn.isHidden = true
                                     exitToExplore = "Switching back to Exploration Mode."
+                                    DispatchQueue.main.async {
+                                        if !self.stopBtn.isHidden{
+                                            self.stopBtn.isHidden = true
+                                        }
+                                    }
                                 }
-                                speakThis(sentence: atBeaconInstr[n]!)
-                                isOnRoute = true
-                                
-                                if exitToExplore != ""{
-                                    sleep(2)
+                                if(narator.isSpeaking && indoorWayFindingFlag && !muteFlag){
+                                    if shortestPath.contains(n){
+                                        if n != shortestPath.first{
+                                            while(n != shortestPath.first){
+                                                shortestPath.remove(at: 0)
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        return
+                                    }
+                                    speakThis(sentence: atBeaconInstr[n]!)
+                                }
+                                else{
+                                    if !muteFlag{
+                                        speakThis(sentence: atBeaconInstr[n]!)
+                                    }
+                                }
+                                if exitToExplore != "" && !muteFlag{
                                     speakThis(sentence: exitToExplore)
+                                    indoorWayFindingFlag = false
+                                    recursionFlag = true
+                                    explorationFlag = true
                                 }
+                                isOnRoute = true
                             }
                         }
                     }
@@ -671,25 +782,43 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
         let utterance = AVSpeechUtterance(string: sentence)
         utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-        if(narator.isSpeaking && indoorWayFindingFlag){
+        
+        if(narator.isSpeaking && explorationFlag && voiceSearchFlag){
             narator.stopSpeaking(at: .immediate)
         }
-        if(narator.isSpeaking && explorationFlag && voiceSearchFlag){
-            narator.stopSpeaking(at: .word)
-        }
         
-        narator.speak(utterance)
+        if !muteFlag{
+            narator.speak(utterance)
+        }
+        else{
+            narator.stopSpeaking(at: .immediate)
+        }
     }
     
+    @IBAction func switchMuteTo(_ sender: Any) {
+        if(!muteFlag){
+            self.naratorMute.setImage(UIImage(systemName: "volume.slash.fill"), for: .normal)
+            if narator.isSpeaking{
+                narator.stopSpeaking(at: .immediate)
+            }
+            muteFlag = true
+        }
+        else{
+            self.naratorMute.setImage(UIImage(systemName: "volume.fill"), for: .normal)
+            if narator.isSpeaking{
+                narator.stopSpeaking(at: .immediate)
+            }
+            muteFlag = false
+        }
+    }
     @objc func doubleTapped() {
         // do something here
-        print("Double Tapped!")
-        if explorationFlag{
+        print("*********** Double Tapped ***********")
+        if explorationFlag && !muteFlag{
             speechFlag = true
             recursionFlag = false
-            explorationMode(currentNode: CURRENT_NODE)
         }
-        if indoorWayFindingFlag{
+        if indoorWayFindingFlag && !muteFlag{
             if !stopRepeatsFlag{
                 speakThis(sentence: "Please move closer to a recognizable beacon")
             }

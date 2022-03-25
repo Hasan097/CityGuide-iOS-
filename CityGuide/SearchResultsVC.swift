@@ -18,6 +18,7 @@ class SearchResultsVC: UITableViewController, UISearchControllerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        overrideUserInterfaceStyle = .light
         searchResultsController.delegate = self
         searchResultsController.searchResultsUpdater = self
         self.view.backgroundColor = .white
@@ -40,7 +41,10 @@ class SearchResultsVC: UITableViewController, UISearchControllerDelegate {
                 locations.append(i)
             }
         }
-        tableView.reloadData()
+        
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
     
     var Filteredlocations : [String] = []

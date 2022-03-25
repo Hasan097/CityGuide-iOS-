@@ -21,6 +21,9 @@
 		BD4685AE26F1571F00AD1420 /* CityGuideUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD4685AD26F1571F00AD1420 /* CityGuideUITests.swift */; };
 		BD7DABB6274F032800DE62A7 /* SearchResultsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7DABB5274F032800DE62A7 /* SearchResultsVC.swift */; };
 		BD81214227977D2400CEE55E /* InstructionGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD81214127977D2300CEE55E /* InstructionGenerator.swift */; };
+		BD926E3227E5283F0071A5A5 /* BeaconScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD926E3127E5283F0071A5A5 /* BeaconScanner.swift */; };
+		BD926E3427E529EB0071A5A5 /* DispatchTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD926E3327E529EB0071A5A5 /* DispatchTimer.swift */; };
+		BD926E3627E52A3F0071A5A5 /* Eddystone.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD926E3527E52A3F0071A5A5 /* Eddystone.swift */; };
 		BDCD6BC7271B3E75006524FA /* Routing.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD6BC6271B3E75006524FA /* Routing.swift */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +65,9 @@
 		BD4685AF26F1571F00AD1420 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BD7DABB5274F032800DE62A7 /* SearchResultsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsVC.swift; sourceTree = "<group>"; };
 		BD81214127977D2300CEE55E /* InstructionGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionGenerator.swift; sourceTree = "<group>"; };
+		BD926E3127E5283F0071A5A5 /* BeaconScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconScanner.swift; sourceTree = "<group>"; };
+		BD926E3327E529EB0071A5A5 /* DispatchTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchTimer.swift; sourceTree = "<group>"; };
+		BD926E3527E52A3F0071A5A5 /* Eddystone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Eddystone.swift; sourceTree = "<group>"; };
 		BDCD6BC6271B3E75006524FA /* Routing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routing.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -127,6 +133,9 @@
 				BD7DABB5274F032800DE62A7 /* SearchResultsVC.swift */,
 				BD35AB7127C04281007ADDF5 /* SpeechRecognizer.swift */,
 				BD1ED6FB27CD797000B2529D /* LevenshteinDistance.swift */,
+				BD926E3127E5283F0071A5A5 /* BeaconScanner.swift */,
+				BD926E3327E529EB0071A5A5 /* DispatchTimer.swift */,
+				BD926E3527E52A3F0071A5A5 /* Eddystone.swift */,
 			);
 			path = CityGuide;
 			sourceTree = "<group>";
@@ -280,15 +289,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				BD7DABB6274F032800DE62A7 /* SearchResultsVC.swift in Sources */,
+				BD926E3627E52A3F0071A5A5 /* Eddystone.swift in Sources */,
 				BD33706D272DF37A007BBD5E /* Database.swift in Sources */,
 				BD46859026F1571A00AD1420 /* ViewController.swift in Sources */,
 				BD2020AF26FD6A49005FDE90 /* SettingsTableController.swift in Sources */,
 				BD46858C26F1571A00AD1420 /* AppDelegate.swift in Sources */,
 				BD35AB7227C04282007ADDF5 /* SpeechRecognizer.swift in Sources */,
 				BD1ED6FC27CD797000B2529D /* LevenshteinDistance.swift in Sources */,
+				BD926E3427E529EB0071A5A5 /* DispatchTimer.swift in Sources */,
 				BD46858E26F1571A00AD1420 /* SceneDelegate.swift in Sources */,
 				BD81214227977D2400CEE55E /* InstructionGenerator.swift in Sources */,
 				BDCD6BC7271B3E75006524FA /* Routing.swift in Sources */,
+				BD926E3227E5283F0071A5A5 /* BeaconScanner.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
