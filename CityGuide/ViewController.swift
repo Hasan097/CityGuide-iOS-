@@ -174,29 +174,27 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         //NSLog("UPDATE: %@", beaconInfo.description)
         //beaconInfo.beaconID.bID
         //beaconInfo.RSSI
-        var defaultRssi : Float = -1000.0
-        if let userInputs = UserDefaults.standard.value(forKey: "userInputItems") as? [String : Float]{
-            let userRssi = userInputs["Set Threshold"] ?? (-80.00)
-            defaultRssi = userRssi
-            if(beaconInfo.RSSI >= Int(userRssi) && beaconInfo.RSSI < -45){
-                if(window[beaconInfo.beaconID.bID] == nil){
-                    let arr = [beaconInfo.RSSI]
-                    window[beaconInfo.beaconID.bID] = arr
+        if userDefinedRssi == 0.0{
+            userDefinedRssi = -85.0
+        }
+        if(beaconInfo.RSSI >= Int(userDefinedRssi) && beaconInfo.RSSI < -45){
+            if(window[beaconInfo.beaconID.bID] == nil){
+                let arr = [beaconInfo.RSSI]
+                window[beaconInfo.beaconID.bID] = arr
+            }
+            else{
+                var arr = window[beaconInfo.beaconID.bID]
+                if arr!.count >= 4{
+                    arr?.remove(at: 0)
                 }
-                else{
-                    var arr = window[beaconInfo.beaconID.bID]
-                    if arr!.count >= 4{
-                        arr?.remove(at: 0)
-                    }
-                    arr?.append(beaconInfo.RSSI)
-                    window[beaconInfo.beaconID.bID] = arr
-                }
+                arr?.append(beaconInfo.RSSI)
+                window[beaconInfo.beaconID.bID] = arr
             }
         }
         
         checkWindow()
         
-        if(CURRENT_NODE != -1 && CLOSEST_RSSI > Double(defaultRssi)){
+        if(CURRENT_NODE != -1 && CLOSEST_RSSI > Double(userDefinedRssi)){
             updateBeaconReading(distance: CLOSEST_RSSI, beacon: CURRENT_NODE)
         }
     }
