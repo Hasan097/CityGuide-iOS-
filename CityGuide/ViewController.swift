@@ -81,12 +81,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         locationManager?.requestAlwaysAuthorization()
         locationManager?.startUpdatingHeading()
         
-        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-        do {
-            engine = try CHHapticEngine()
-            try engine?.start()
-        } catch {
-            print("There was an error creating the engine: \(error.localizedDescription)")
+        if UIDevice.current.userInterfaceIdiom == .phone{
+            guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+            do {
+                engine = try CHHapticEngine()
+                try engine?.start()
+            } catch {
+                print("There was an error creating the engine: \(error.localizedDescription)")
+            }
         }
         
         if let userInputs = UserDefaults.standard.value(forKey: "userInputItems") as? [String : Float]{
@@ -399,7 +401,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
 
     @IBAction func didTapStop(_ sender: Any) {
         indoorWayFindingFlag = false
-        hapticVibration(atDestination: true)
+        if UIDevice.current.userInterfaceIdiom == .phone{
+            hapticVibration(atDestination: true)
+        }
         explorationFlag = true
         speechFlag = true
         recursionFlag = false
@@ -508,7 +512,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
         var exitToExplore = ""
         if speechFlag && !recursionFlag{
-            hapticVibration()
+            if UIDevice.current.userInterfaceIdiom == .phone{
+                hapticVibration()
+            }
             for i in dArray{
                 if i["beacon_id"] as! Int == CURRENT_NODE{
                     if let checkerForHub = i["locname"] as? String{
@@ -519,7 +525,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                                 if atBeaconInstr[n]!.contains("destination."){
                                     indoorWayFindingFlag = false
                                     print("Near Destination")
-                                    hapticVibration(atDestination: true)
+                                    if UIDevice.current.userInterfaceIdiom == .phone{
+                                        hapticVibration(atDestination: true)
+                                    }
                                     explorationFlag = true
                                     speechFlag = true
                                     recursionFlag = false
@@ -576,7 +584,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                         let n = i["node"] as! Int
                         if !shortestPath.contains(n){
                             speakThis(sentence: "Rerouting")
-                            hapticVibration()
+                            if UIDevice.current.userInterfaceIdiom == .phone{
+                                hapticVibration()
+                            }
                             shortestPath = pathFinder(current: n, destination: shortestPath.last!)
                             return true
                         }
@@ -608,7 +618,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             DispatchQueue.main.async(group: group){
                 DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                     AudioServicesPlaySystemSound(1113)
-                    self.hapticVibration()
+                    if UIDevice.current.userInterfaceIdiom == .phone{
+                        self.hapticVibration()
+                    }
                     self.speechRecognizer.reset()
                     self.speechRecognizer.transcribe()
                     print("Transcription started...")
@@ -628,7 +640,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             speakThis(sentence: "Please say your destination after the indication.")
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 AudioServicesPlaySystemSound(1113)
-                self.hapticVibration()
+                if UIDevice.current.userInterfaceIdiom == .phone{
+                    self.hapticVibration()
+                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6){
                     self.speechRecognizer.reset()
                     self.speechRecognizer.transcribe()
