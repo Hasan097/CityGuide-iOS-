@@ -58,6 +58,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     var userResponse = false
     var voiceSearchFlag = false
     var muteFlag = false
+    var allowDot = false
     
     @objc func buttonDown(_ sender: UIButton) {
         singleFire(check: nil)
@@ -177,7 +178,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         //beaconInfo.beaconID.bID
         //beaconInfo.RSSI
         if userDefinedRssi == 0.0{
-            userDefinedRssi = -85.0
+            userDefinedRssi = -80.0
         }
         if(beaconInfo.RSSI >= Int(userDefinedRssi) && beaconInfo.RSSI < -45){
             if(window[beaconInfo.beaconID.bID] == nil){
@@ -217,13 +218,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         print("==================================")
         if(maxNumOfDetection > 5){
             for i in window.keys{
-                let checker = window[i]!.count;
-                if checker < 2{
+                let checker = window[i]!;
+                var sum = 0
+                for i in checker{
+                    sum += i
+                }
+                if Float(sum/checker.count) < userDefinedRssi{
+                    window.removeValue(forKey: i)
+                }
+                if !listOfBeacon.contains(i){
                     window.removeValue(forKey: i)
                 }
             }
-            maxNumOfDetection = 0
         }
+        maxNumOfDetection = 0
         screeningWindow()
     }
     
@@ -262,6 +270,29 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             window.removeValue(forKey: FARTHEST_NODE)
         }
         print("Closest Beacon : " + String(CURRENT_NODE) + " Rssi : " + String(CLOSEST_RSSI))
+        
+        for i in dArray{    // to match groupid and floorplan
+            if i["beacon_id"] as! Int == CURRENT_NODE{
+                if let checkerForHub = i["locname"] as? String{
+                    if checkerForHub.contains("Hub "){
+                        let n = i["group_id"] as? Int
+                        if n != groupID{
+                            newGroupNoticed = true
+                        }
+                    }
+                }
+            }
+        }
+        
+        DispatchQueue.main.async {
+            if(self.CURRENT_NODE != -1 && self.floorPlan.image != nil){
+                let coordinates = extractCoordinates(currNode: self.CURRENT_NODE)
+                if(!coordinates.isEmpty && image != nil){
+                    self.floorPlan.image = image
+                    self.floorPlan.image = drawOnImage(self.floorPlan.image!, x: coordinates[0], y: coordinates[1])
+                }
+            }
+        }
 //        print("Farthest Beacon : " + String(farthestBeacon) + " Rssi : " + String(farthestRssi))
     }
     // ===================================
@@ -276,42 +307,50 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             }
         }
         
-        if dArray.count != 0{
-            let temp = dArray[0]
-            if let val = temp["group_id"] as? Int{
-                if groupID != val{
-                    newGroupNoticed = true
-                    groupID = val
-                }
-                if detectedGroupId != groupID && detectedGroupId != -1{
-                    detectedGroupId = groupID
-                    groupChangeNoticed()                // Call to get reset matrix values
-                }
-            }
-            if let v = temp["_level"] as? Int{
-                if floorNo != v{
-                    floorNo = v
-                    postToDB(typeOfAction: "getFloor", beaconID: groupID, auth: "eW7jYaEz7mnx0rrM", floorNum: floorNo, vc: self)
+        if dArray.count != 0 && newGroupNoticed{
+            for i in dArray{    // to match groupid and floorplan
+                if i["beacon_id"] as! Int == CURRENT_NODE{
+                    if let checkerForHub = i["locname"] as? String{
+                        if checkerForHub.contains("Hub "){
+                            let n = i["group_id"] as? Int
+                            if n != groupID{
+                                groupID = n!
+                            }
+                            if detectedGroupId != groupID && detectedGroupId != -1{
+                                detectedGroupId = groupID
+                                groupChangeNoticed()                // Call to get reset matrix values
+                            }
+                            if let v = i["_level"] as? Int{
+                                if floorNo != v{
+                                    floorNo = v
+                                    postToDB(typeOfAction: "getFloor", beaconID: groupID, auth: "eW7jYaEz7mnx0rrM", floorNum: floorNo, vc: self)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
         
         DispatchQueue.main.async {
-            if image != nil && self.floorPlan.image != image{
+            if image != nil && self.floorPlan.image != image && !self.allowDot{
                 self.floorPlan.image = image
+                self.allowDot = true
             }
         }
         
         if groupID != -1 && newGroupNoticed && floorNo != -10{
             // get all the beacons for the new group.
             print("Group ID set: \(groupID)")
+            self.allowDot = false
+            listOfBeacon.removeAll()
             postToDB(typeOfAction: "getbeacons", beaconID: groupID, auth: "eW7jYaEz7mnx0rrM", floorNum: floorNo, vc: self)
             newGroupNoticed = false
             getBeaconsFlag = true
         }
         
-        if getBeaconsFlag && !listOfBecaon.isEmpty{ // get all values of the new set of beacons
-            for i in listOfBecaon{
+        if getBeaconsFlag && !listOfBeacon.isEmpty{ // get all values of the new set of beacons
+            for i in listOfBeacon{
                 if !beaconList.contains(i){
                     beaconList.append(i)
                     postToDB(typeOfAction: "beacons", beaconID: i, auth: "eW7jYaEz7mnx0rrM", floorNum: nil, vc: self)

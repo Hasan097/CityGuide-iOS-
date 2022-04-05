@@ -25,6 +25,7 @@
 		BD926E3427E529EB0071A5A5 /* DispatchTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD926E3327E529EB0071A5A5 /* DispatchTimer.swift */; };
 		BD926E3627E52A3F0071A5A5 /* Eddystone.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD926E3527E52A3F0071A5A5 /* Eddystone.swift */; };
 		BDCD6BC7271B3E75006524FA /* Routing.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD6BC6271B3E75006524FA /* Routing.swift */; };
+		BDEDE69327FB6D3900029FCF /* FloorPlanManipulation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDEDE69227FB6D3900029FCF /* FloorPlanManipulation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +70,7 @@
 		BD926E3327E529EB0071A5A5 /* DispatchTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchTimer.swift; sourceTree = "<group>"; };
 		BD926E3527E52A3F0071A5A5 /* Eddystone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Eddystone.swift; sourceTree = "<group>"; };
 		BDCD6BC6271B3E75006524FA /* Routing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routing.swift; sourceTree = "<group>"; };
+		BDEDE69227FB6D3900029FCF /* FloorPlanManipulation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloorPlanManipulation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +138,7 @@
 				BD926E3127E5283F0071A5A5 /* BeaconScanner.swift */,
 				BD926E3327E529EB0071A5A5 /* DispatchTimer.swift */,
 				BD926E3527E52A3F0071A5A5 /* Eddystone.swift */,
+				BDEDE69227FB6D3900029FCF /* FloorPlanManipulation.swift */,
 			);
 			path = CityGuide;
 			sourceTree = "<group>";
@@ -300,6 +303,7 @@
 				BD46858E26F1571A00AD1420 /* SceneDelegate.swift in Sources */,
 				BD81214227977D2400CEE55E /* InstructionGenerator.swift in Sources */,
 				BDCD6BC7271B3E75006524FA /* Routing.swift in Sources */,
+				BDEDE69327FB6D3900029FCF /* FloorPlanManipulation.swift in Sources */,
 				BD926E3227E5283F0071A5A5 /* BeaconScanner.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

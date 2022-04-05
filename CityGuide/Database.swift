@@ -37,7 +37,7 @@ var beaconData : [String:Any] = [  // A default beacon information template
 ]
 var dArray : [[String:Any]] = []  // The array containting values of a cluster of beacons
 var destinations : [String] = []
-var listOfBecaon : [Int] = []
+var listOfBeacon : [Int] = []
 var image : UIImage? = nil
 
 func postToDB(typeOfAction: String, beaconID: Int, auth: String, floorNum: Int?, vc : UIViewController){
@@ -137,7 +137,7 @@ func postToDB(typeOfAction: String, beaconID: Int, auth: String, floorNum: Int?,
                                 let attributedString = try NSAttributedString(data: data!, options: [:], documentAttributes: nil)
                                 let beaconList = attributedString.string.split(separator: "\n")
                                 for i in beaconList{
-                                    listOfBecaon.append(Int(i)!)
+                                    listOfBeacon.append(Int(i)!)
                                 }
                             }
                         } catch {
