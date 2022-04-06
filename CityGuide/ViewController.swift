@@ -208,7 +208,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     // Screening window code and functions
     // ===================================
     func checkWindow(){
-        var maxNumOfDetection = 0;
+        var maxNumOfDetection = 0
+        var singleRssiArray = 0
+        var doubleRssiArray = 0
         print("==================================")
         for i in window.keys{
             print(String(i), terminator: ": ")
@@ -223,10 +225,30 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                 for i in checker{
                     sum += i
                 }
+                
+                if(checker.count == 1){
+                    singleRssiArray+=1
+                }
+                if(checker.count == 2){
+                    doubleRssiArray+=1
+                }
+                
                 if Float(sum/checker.count) < userDefinedRssi{
                     window.removeValue(forKey: i)
                 }
                 if !listOfBeacon.contains(i){
+                    window.removeValue(forKey: i)
+                }
+            }
+        }
+        
+        if(singleRssiArray > 3 || doubleRssiArray > 3){
+            for i in window.keys{
+                let checker = window[i]!
+                if(checker.count == 1 && singleRssiArray > 3){
+                    window.removeValue(forKey: i)
+                }
+                if(checker.count == 2 && doubleRssiArray > 3){
                     window.removeValue(forKey: i)
                 }
             }
@@ -244,7 +266,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             let arr = window[i]
             let denominator = arr?.count
             var numerator = 0
-            if(denominator == 4){
+            if(denominator! >= 4){
                 for vector in arr!{
                     numerator = numerator + (-1 * vector)
                 }
@@ -269,7 +291,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         if FARTHEST_NODE != -1 && CURRENT_NODE != FARTHEST_NODE{
             window.removeValue(forKey: FARTHEST_NODE)
         }
-        print("Closest Beacon : " + String(CURRENT_NODE) + " Rssi : " + String(CLOSEST_RSSI))
+        print("Closest Beacon : " + String(CURRENT_NODE) + " Rssi : " + String(CLOSEST_RSSI) + " Group : " + String(groupID))
         
         for i in dArray{    // to match groupid and floorplan
             if i["beacon_id"] as! Int == CURRENT_NODE{
@@ -278,6 +300,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                         let n = i["group_id"] as? Int
                         if n != groupID{
                             newGroupNoticed = true
+                            break
                         }
                     }
                 }
@@ -326,6 +349,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                                     postToDB(typeOfAction: "getFloor", beaconID: groupID, auth: "eW7jYaEz7mnx0rrM", floorNum: floorNo, vc: self)
                                 }
                             }
+                            break
                         }
                     }
                 }
@@ -350,12 +374,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
         
         if getBeaconsFlag && !listOfBeacon.isEmpty{ // get all values of the new set of beacons
+            dArray.removeAll()
+            beaconList.removeAll()
             for i in listOfBeacon{
                 if !beaconList.contains(i){
                     beaconList.append(i)
                     postToDB(typeOfAction: "beacons", beaconID: i, auth: "eW7jYaEz7mnx0rrM", floorNum: nil, vc: self)
                 }
             }
+            
+            //speechFlag = true
+            //recursionFlag = false
             getBeaconsFlag = false
         }
         
@@ -373,6 +402,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                             if n != shortestPath.first!{
                                 speakThis(sentence: "Re-Routing")
                                 shortestPath = pathFinder(current: n, destination: shortestPath.last!)
+                                break
                             }
                         }
                     }
@@ -479,6 +509,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                     if checkerForHub.contains("Hub "){
                         let n = i["node"] as! Int
                         srVC.setCurrentNode(node: n)
+                        break
                     }
                 }
             }
@@ -749,6 +780,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                         if let checkerForHub = i["locname"] as? String{
                             if checkerForHub.contains("Hub "){
                                 currNode = i["node"] as! Int
+                                break
                             }
                         }
                     }
@@ -759,6 +791,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                         self.indoorKeyIgnition()
                         self.voiceSearchFlag = false
                         shortestPath = pathFinder(current: currNode, destination: desNode)
+                        break
                     }
                 }
             }
@@ -770,6 +803,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                     if let checkerForHub = i["locname"] as? String{
                         if checkerForHub.contains("Hub "){
                             currNode = i["node"] as! Int
+                            break
                         }
                     }
                 }
@@ -780,6 +814,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                     self.indoorKeyIgnition()
                     self.voiceSearchFlag = false
                     shortestPath = pathFinder(current: currNode, destination: desNode)
+                    break
                 }
             }
         }
@@ -884,6 +919,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                             if checkerForHub.contains("Hub "){
                                 let n = i["node"] as! Int
                                 speakThis(sentence: atBeaconInstr[n]!)
+                                break
                             }
                         }
                     }
