@@ -43,25 +43,55 @@ func turnTowards(from : String, to : String) -> String{
     let fromIndex = circle.firstIndex(of: from) // Possible index [0 to 7]
     let sub = fromIndex! - toIndex!
     
-    switch(sub){
-        case 0:
-            guidance = "Go straight for "
-        case let n where n == -1 || n == 7:
-            guidance = "Turn slight right and go straight for "
-        case let n where n == 1 || n == -7:
-            guidance = "Turn slight left and go straight for "
-        case let n where n == -2 || n == 6:
-            guidance = "Take a sharp right and go straight for "
-        case let n where n == 2 || n == -6:
-            guidance = "Take a sharp left and go straight for "
-        case let n where n == 4 || n == -4:
-            guidance = "Turn around and go straight for "
-        case let n where n == -3 || n == 5:
-            guidance = "Turn 4 O'Clock and go straight for "
-        case let n where n == 3 || n == -5:
-            guidance = "Turn 7 O'Clock and go straight for "
-        default :
-            guidance = "Error"
+    var user = 1
+    let userProfile = UserDefaults.standard.value(forKey: "checkmarks") as? [String:Int]
+    if !userProfile!.isEmpty{
+        user = userProfile!["User Category"]!
+    }
+    // user = 1 or 2 is a sighted user and user = 0 is blind
+    if user == 1 || user == 2{
+        switch(sub){
+            case 0:
+                guidance = "Go straight for "
+            case let n where n == -1 || n == 7:
+                guidance = "Turn slight right and go straight for "
+            case let n where n == 1 || n == -7:
+                guidance = "Turn slight left and go straight for "
+            case let n where n == -2 || n == 6:
+                guidance = "Take a sharp right and go straight for "
+            case let n where n == 2 || n == -6:
+                guidance = "Take a sharp left and go straight for "
+            case let n where n == 4 || n == -4:
+                guidance = "Turn around and go straight for "
+            case let n where n == -3 || n == 5:
+                guidance = "Turn 4 O'Clock and go straight for "
+            case let n where n == 3 || n == -5:
+                guidance = "Turn 7 O'Clock and go straight for "
+            default :
+                guidance = "Error"
+        }
+    }
+    else{
+        switch(sub){
+            case 0:
+                guidance = "Go straight"
+            case let n where n == -1 || n == 7:
+                guidance = "Turn slight right and go straight"
+            case let n where n == 1 || n == -7:
+                guidance = "Turn slight left and go straight"
+            case let n where n == -2 || n == 6:
+                guidance = "Take a sharp right and go straight"
+            case let n where n == 2 || n == -6:
+                guidance = "Take a sharp left and go straight"
+            case let n where n == 4 || n == -4:
+                guidance = "Turn around and go straight"
+            case let n where n == -3 || n == 5:
+                guidance = "Turn 4 O'Clock and go straight"
+            case let n where n == 3 || n == -5:
+                guidance = "Turn 7 O'Clock and go straight"
+            default :
+                guidance = "Error"
+        }
     }
     
     return guidance
@@ -73,18 +103,23 @@ func distCalculator (cost : Int) -> String{
     if let userInputs = UserDefaults.standard.value(forKey: "checkmarks") as? [String : Int]{
         unitOfMeasurement = userInputs["Distance Unit"] ?? -1
     }
+    var user = 1
+    let userProfile = UserDefaults.standard.value(forKey: "checkmarks") as? [String:Int]
+    if !userProfile!.isEmpty{
+        user = userProfile!["User Category"]!
+    }
     
-    if unitOfMeasurement == 0{
+    if unitOfMeasurement == 0 && (user == 1 || user == 2){
         //meters
         distanceDialog = (String(cost) + " meters")
     }
-    else if unitOfMeasurement == 1{
+    else if unitOfMeasurement == 1 && (user == 1 || user == 2){
         //feet
         var toFeet = Double(cost) * 3.28
         toFeet = Double(round(100 * toFeet) / 100)
         distanceDialog = (String(Int(toFeet)) + " feet")
     }
-    else {
+    else if (user == 1 || user == 2) {
         //error
         distanceDialog = "Error"
     }

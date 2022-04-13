@@ -59,6 +59,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     var voiceSearchFlag = false
     var muteFlag = false
     var allowDot = false
+    var searchListResetFlag = false
     
     @objc func buttonDown(_ sender: UIButton) {
         singleFire(check: nil)
@@ -81,6 +82,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         locationManager?.delegate = self
         locationManager?.requestAlwaysAuthorization()
         locationManager?.startUpdatingHeading()
+        
+        becomeFirstResponder()
         
         if UIDevice.current.userInterfaceIdiom == .phone{
             guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
@@ -111,6 +114,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         self.naratorMute.tintColor = .black
         self.recButton.tintColor = .black
         self.stopBtn.tintColor = .black
+    }
+    
+    override var canBecomeFirstResponder: Bool{
+        return true
+    }
+    
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        if motion == .motionShake{
+            doubleTapped()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -264,16 +277,27 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         var farthestRssi = 100000.0
         for i in window.keys{
             let arr = window[i]
-            let denominator = arr?.count
+            let arrSize = arr?.count
             var numerator = 0
-            if(denominator! >= 4){
+            
+            if(arrSize! >= 4){
+                var weight = arrSize!
+                
                 for vector in arr!{
-                    numerator = numerator + (-1 * vector)
+                    numerator = numerator + (-1 * vector * (weight))
+                    weight-=1
                 }
+                var denominator = 0
+                for w in 1...arrSize!{
+                    denominator += w
+                }
+                
                 let temp = closestRssi
                 let far = farthestRssi
-                closestRssi = max(closestRssi, -1.0 * Double(numerator / denominator!))
-                farthestRssi = min(farthestRssi, -1.0 * Double(numerator / denominator!))
+                
+                closestRssi = max(closestRssi, -1.0 * Double(numerator / denominator))
+                farthestRssi = min(farthestRssi, -1.0 * Double(numerator / denominator))
+                
                 if closestRssi != temp{
                     closestBeacon = i
                 }
@@ -290,6 +314,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
         if FARTHEST_NODE != -1 && CURRENT_NODE != FARTHEST_NODE{
             window.removeValue(forKey: FARTHEST_NODE)
+        }
+        if(groupID == -1){
+            newGroupNoticed = true
         }
         print("Closest Beacon : " + String(CURRENT_NODE) + " Rssi : " + String(CLOSEST_RSSI) + " Group : " + String(groupID))
         
@@ -316,7 +343,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                 }
             }
         }
-//        print("Farthest Beacon : " + String(farthestBeacon) + " Rssi : " + String(farthestRssi))
     }
     // ===================================
     
@@ -368,9 +394,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             print("Group ID set: \(groupID)")
             self.allowDot = false
             listOfBeacon.removeAll()
+            destinations.removeAll()
+            matrixDictionary.removeAll()
             postToDB(typeOfAction: "getbeacons", beaconID: groupID, auth: "eW7jYaEz7mnx0rrM", floorNum: floorNo, vc: self)
             newGroupNoticed = false
             getBeaconsFlag = true
+            searchListResetFlag = true
         }
         
         if getBeaconsFlag && !listOfBeacon.isEmpty{ // get all values of the new set of beacons
@@ -383,13 +412,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                 }
             }
             
-            //speechFlag = true
-            //recursionFlag = false
+            if(explorationFlag){
+                speechFlag = true
+                recursionFlag = false
+            }
             getBeaconsFlag = false
         }
         
-        if destinations.count != srVC.locations.count{
+        if destinations.count != srVC.locations.count || searchListResetFlag{
             srVC.getLocations(values: destinations)
+            searchListResetFlag = false
         }
         
         if pathFound{
@@ -548,13 +580,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
         
         if speechFlag && !recursionFlag && !voiceSearchFlag && !muteFlag{
-            let numPOI = POI.count
+            //let numPOI = POI.count
             if(narator.isSpeaking){
                 narator.stopSpeaking(at: .immediate)
             }
-            if numPOI > 1{
-                speakThis(sentence: "You are near " + String(numPOI) + " points of interest")
-            }
+//            if numPOI > 1{
+//                speakThis(sentence: "You are near " + String(numPOI) + " points of interest")
+//            }
             
             for j in POI{
 //                print(POI)
@@ -571,6 +603,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
         if currentlyAt != CURRENT_NODE{
             recursionFlag = false
+            speechFlag = true
         }
     }
     
@@ -870,8 +903,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         {
             print("audioSession properties weren't set because of an error.")
         }
+        
+        var user = 1
+        let userProfile = UserDefaults.standard.value(forKey: "checkmarks") as? [String:Int]
+        if !userProfile!.isEmpty{
+            user = userProfile!["User Category"]!
+        }
+        
         let utterance = AVSpeechUtterance(string: sentence)
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        if user == 0{
+            utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+            utterance.rate = 0.7
+        }
+        else{
+            utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+            utterance.rate = 0.5
+        }
         
         if(narator.isSpeaking && explorationFlag && voiceSearchFlag){
             narator.stopSpeaking(at: .immediate)
@@ -892,6 +939,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                 narator.stopSpeaking(at: .immediate)
             }
             muteFlag = true
+            self.naratorMute.accessibilityLabel = "Unmute button"
         }
         else{
             self.naratorMute.setImage(UIImage(systemName: "volume.fill"), for: .normal)
@@ -899,11 +947,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                 narator.stopSpeaking(at: .immediate)
             }
             muteFlag = false
+            self.naratorMute.accessibilityLabel = "Mute button"
         }
     }
     @objc func doubleTapped() {
         // do something here
-        print("*********** Double Tapped ***********")
+        print("*********** Speak Again Command Detected ***********")
         if explorationFlag && !muteFlag{
             speechFlag = true
             recursionFlag = false

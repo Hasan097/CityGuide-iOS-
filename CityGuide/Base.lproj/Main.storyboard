@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="cJd-qO-n9E">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="cJd-qO-n9E">
     <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -38,6 +38,7 @@
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oYs-sI-Dl3" userLabel="Record Button">
                                         <rect key="frame" x="0.0" y="774" width="390" height="50"/>
                                         <color key="backgroundColor" systemColor="systemYellowColor"/>
+                                        <accessibility key="accessibilityConfiguration" label="Microphone button"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="JPm-Fj-JpN"/>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="300" id="f6M-gJ-8aQ"/>
@@ -53,6 +54,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nVd-na-qpp" userLabel="Settings Button">
                                 <rect key="frame" x="320" y="108" width="50" height="50"/>
                                 <color key="backgroundColor" systemColor="systemYellowColor"/>
+                                <accessibility key="accessibilityConfiguration" label="Settings button"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="svr-Wx-RNP"/>
                                     <constraint firstAttribute="width" constant="50" id="xLS-48-9wW"/>
@@ -76,6 +78,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ph9-rv-IAX" userLabel="Search Button">
                                 <rect key="frame" x="332" y="709" width="50" height="50"/>
                                 <color key="backgroundColor" systemColor="systemYellowColor"/>
+                                <accessibility key="accessibilityConfiguration" label="Search button"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="50" id="tLv-eV-XnU"/>
                                     <constraint firstAttribute="height" constant="50" id="zAD-6t-FpZ"/>
@@ -91,6 +94,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nao-yv-DVP" userLabel="Stop Button">
                                 <rect key="frame" x="332" y="623" width="50" height="50"/>
                                 <color key="backgroundColor" systemColor="systemYellowColor"/>
+                                <accessibility key="accessibilityConfiguration" label="Cancel routing button"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="9RT-Oa-OCa"/>
                                     <constraint firstAttribute="width" constant="50" id="dFV-RB-NtV"/>
@@ -106,6 +110,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WGA-WC-rXC" userLabel="Mute Narator">
                                 <rect key="frame" x="20" y="108" width="50" height="50"/>
                                 <color key="backgroundColor" systemColor="systemYellowColor"/>
+                                <accessibility key="accessibilityConfiguration" label="Mute button"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="50" id="kck-4a-dM3"/>
                                     <constraint firstAttribute="height" constant="50" id="uTn-g5-CWM"/>

@@ -36,6 +36,9 @@ class SearchResultsVC: UITableViewController, UISearchControllerDelegate {
     
     var locations : [String] = []
     func getLocations(values : [String]){
+        if !locations.isEmpty{
+            locations.removeAll()
+        }
         for i in values{
             if !locations.contains(i){
                 locations.append(i)
