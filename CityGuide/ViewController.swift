@@ -205,6 +205,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                 }
                 arr?.append(beaconInfo.RSSI)
                 window[beaconInfo.beaconID.bID] = arr
+                for i in window.keys{
+                    if window[i] != arr{
+                        if window[i]!.count >= 4{
+                            window[i]?.remove(at: 0)
+                        }
+                        window[i]!.append(-100)
+                    }
+                }
             }
         }
         
@@ -327,6 +335,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                         let n = i["group_id"] as? Int
                         if n != groupID{
                             newGroupNoticed = true
+                            break
+                        }
+                        let flr = i["_level"] as? Int
+                        if flr != floorNo{
+                            floorNo = flr!
+                            allowDot = false
+                            postToDB(typeOfAction: "getFloor", beaconID: groupID, auth: "eW7jYaEz7mnx0rrM", floorNum: floorNo, vc: self)
+                            DispatchQueue.main.async {
+                                if image != nil && self.floorPlan.image != image && !self.allowDot{
+                                    self.floorPlan.image = image
+                                    self.allowDot = true
+                                }
+                            }
                             break
                         }
                     }

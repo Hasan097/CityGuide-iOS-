@@ -183,45 +183,118 @@ func instructions(path : [Int], angle : Double) -> [Int : String]{
     var instructionToUser : [String] = []
     var to = ""
     var from = ""
+    var pathCopy = path
     
-    if path.count == 1{
+    if pathCopy.count == 1{
         //Already at destination
         instructionToUser.append("You are within range of your destination.")
     }
     else{
         for i in path{
             let conn = matrixDictionary[i] as! [String:Int]
-            
-            if i == path.first{
-                from = userDirection
-            }
-            if path[path.firstIndex(of: i)! + 1] == path.last{ // if on the second last node
-                for nextNode in possibleBeaconLocations{
-                    if Int(truncating: conn[nextNode]! as NSNumber) == path.last{
-                        to = comapssDirection[possibleBeaconLocations.firstIndex(of: nextNode)!]
-                        let distToCalcualate = conn[costToBeacon[possibleBeaconLocations.firstIndex(of: nextNode)!]]!
-                        dis = distCalculator(cost: Int(truncating: distToCalcualate as NSNumber))
-                        instructionToUser.append(turnTowards(from: from, to: to) + dis + " to reach your destination.")
-                        break
+            // check if i is elevator && if i is not the last element in the path?
+            if(pathCopy.contains(i) && pathCopy.firstIndex(of: i)! < pathCopy.count-1){
+                var checkForElevator = ""
+                var checkForElevator2 = ""
+                var toFloor = 0
+                let index = pathCopy.firstIndex(of: i)
+                if index!+1 < pathCopy.count-1 && index!+2 <= pathCopy.count-1{
+                    for j in dArray{
+                        if j["node"] as! Int == pathCopy[index! + 1]{
+                            checkForElevator = (j["locname"] as? String)!
+                        }
+                    }
+                    for j in dArray{
+                        if j["node"] as! Int == pathCopy[index! + 2]{
+                            checkForElevator2 = (j["locname"] as? String)!
+                            toFloor = (j["_level"] as? Int)!
+                        }
                     }
                 }
-                break
-            }
-            
-            for nextNode in possibleBeaconLocations{
-                if Int(truncating: conn[nextNode]! as NSNumber) == path[path.firstIndex(of: i)! + 1]{
-                    to = comapssDirection[possibleBeaconLocations.firstIndex(of: nextNode)!]
-                    let distToCalcualate = conn[costToBeacon[possibleBeaconLocations.firstIndex(of: nextNode)!]]!
-                    dis = distCalculator(cost: Int(truncating: distToCalcualate as NSNumber))
-                    instructionToUser.append(turnTowards(from: from, to: to) + dis)
+                
+                // Check for 2 elevators else normal instructions
+                if checkForElevator.contains("Elevator ") && checkForElevator2.contains("Elevator "){
+                    for nextNode in possibleBeaconLocations{
+                        if Int(truncating: conn[nextNode]! as NSNumber) == pathCopy[pathCopy.firstIndex(of: i)! + 1]{
+                            if from == ""{
+                                from = userDirection
+                            }
+                            to = comapssDirection[possibleBeaconLocations.firstIndex(of: nextNode)!]
+                            let distToCalcualate = conn[costToBeacon[possibleBeaconLocations.firstIndex(of: nextNode)!]]!
+                            dis = distCalculator(cost: Int(truncating: distToCalcualate as NSNumber))
+                            break
+                        }
+                    }
+                    
+                    pathCopy.remove(at: index!+1)
+                    pathCopy.remove(at: index!+1)
+                    if index!+1 == path.count-1{
+                        instructionToUser.append(turnTowards(from: from, to: to) + dis + " and use the elevator to go to floor " + String(toFloor) + " to reach your destination.")
+                    }
+                    else{
+                        instructionToUser.append(turnTowards(from: from, to: to) + dis + " and use the elevator to go to floor " + String(toFloor))
+                    }
+                }
+                else{
+                    if i == pathCopy.first{
+                        from = userDirection
+                    }
+                    if pathCopy.firstIndex(of: i)! + 1 <= pathCopy.count-1 && pathCopy[pathCopy.firstIndex(of: i)! + 1] == pathCopy.last{ // if on the second last node
+                        var elevatorFlag = false
+                        for nextNode in possibleBeaconLocations{
+                            if from == ""{
+                                elevatorFlag = true
+                                break
+                            }
+                            if Int(truncating: conn[nextNode]! as NSNumber) == pathCopy.last{
+                                to = comapssDirection[possibleBeaconLocations.firstIndex(of: nextNode)!]
+                                let distToCalcualate = conn[costToBeacon[possibleBeaconLocations.firstIndex(of: nextNode)!]]!
+                                dis = distCalculator(cost: Int(truncating: distToCalcualate as NSNumber))
+                                instructionToUser.append(turnTowards(from: from, to: to) + dis + " to reach your destination.")
+                                break
+                            }
+                        }
+                        if elevatorFlag{
+                            let prevConn = matrixDictionary[path[path.firstIndex(of: i)! - 1]] as! [String:Int]
+                            
+                            for nextNode in possibleBeaconLocations{
+                                if Int(truncating: conn[nextNode]! as NSNumber) == pathCopy.last{
+                                    to = comapssDirection[possibleBeaconLocations.firstIndex(of: nextNode)!]
+                                    break
+                                }
+                            }
+                            
+                            for nextNode in possibleBeaconLocations{
+                                if Int(truncating: prevConn[nextNode]! as NSNumber) == i{
+                                    from = comapssDirection[possibleBeaconLocations.firstIndex(of: nextNode)!]
+                                    let distToCalcualate = conn[costToBeacon[possibleBeaconLocations.firstIndex(of: nextNode)!]]!
+                                    dis = distCalculator(cost: Int(truncating: distToCalcualate as NSNumber))
+                                    instructionToUser.append(turnTowards(from: from, to: to) + dis + " to reach your destination.")
+                                    break
+                                }
+                            }
+                            
+                        }
+                        break
+                    }
+                    
+                    for nextNode in possibleBeaconLocations{
+                        if  pathCopy.firstIndex(of: i)! + 1 <= pathCopy.count-1 &&
+                            Int(truncating: conn[nextNode]! as NSNumber) == pathCopy[pathCopy.firstIndex(of: i)! + 1]{
+                            to = comapssDirection[possibleBeaconLocations.firstIndex(of: nextNode)!]
+                            let distToCalcualate = conn[costToBeacon[possibleBeaconLocations.firstIndex(of: nextNode)!]]!
+                            dis = distCalculator(cost: Int(truncating: distToCalcualate as NSNumber))
+                            instructionToUser.append(turnTowards(from: from, to: to) + dis)
+                        }
+                    }
+                    from = to
                 }
             }
-            from = to
         }
     }
-    for k in path{
-        if k != path.last{
-            atBeaconInstruction[k] = instructionToUser[path.firstIndex(of: k)!]
+    for k in pathCopy{
+        if k != pathCopy.last{
+            atBeaconInstruction[k] = instructionToUser[pathCopy.firstIndex(of: k)!]
         }
     }
     

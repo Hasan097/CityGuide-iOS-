@@ -62,12 +62,73 @@ func makeMatrix(template : [String:Any]){
 
 }
 
+func checkForFloorChange(node : Int, curr : Int) -> [Int]{
+    var startflrno = 0
+    for i in dArray{    // to get starting floor number
+        if i["beacon_id"] as! Int == curr{
+            let flr = i["_level"] as? Int
+            if(flr != nil){
+                startflrno = flr!
+            }
+        }
+    }
+    
+    var floorSwitch = false
+    var destFloorNum = 0
+    for i in dArray{    // to get destination floor number
+        if i["beacon_id"] as! Int == node{
+            let flr = i["_level"] as? Int
+            if flr != startflrno{
+                floorSwitch = true
+                destFloorNum = flr!
+            }
+        }
+    }
+    
+    var newDest : [Int] = [node,0]      // [new dest from start, new start to dest]
+    if floorSwitch{
+        for i in dArray{    // to get new dest from source (elevator)
+            if let checkerForHub = i["locname"] as? String{
+                if checkerForHub.contains("Elevator "){
+                    if i["_level"] as! Int == startflrno{
+                        let nD = i["beacon_id"] as! Int
+                        newDest[0] = nD
+                    }
+                }
+            }
+        }
+        
+        for i in dArray{    // to get new start to the dest (elevator)
+            if let checkerForHub = i["locname"] as? String{
+                if checkerForHub.contains("Elevator "){
+                    if i["_level"] as! Int == destFloorNum{
+                        let nS = i["beacon_id"] as! Int
+                        newDest[1] = nS
+                    }
+                }
+            }
+        }
+    }
+    
+    return newDest
+}
+
 func pathFinder(current : Int, destination : Int) -> [Int]{
     var visited : [Int] = []            // An array of visted nodes
     var unvisited : [Int] = []          // An array of unvisited nodes
     var currentNode = current
     var shortest : [Int] = []
     var pathDictionary : [Int : [Int]] = [ : ]
+    
+    var dest = destination
+    var str = current
+    
+    let check : [Int] = checkForFloorChange(node: destination, curr: current)
+    if check[0] != destination && check [1] != 0{
+        // Path will be current -> dest -> str -> destination
+        dest = check[0]
+        str = check[1]
+    }
     
     for keys in matrixDictionary.keys{
         if let m = matrixDictionary[keys] as? [String:Int]{
@@ -92,7 +153,7 @@ func pathFinder(current : Int, destination : Int) -> [Int]{
 //        print(matrixDictionary[j])
 //    }
     
-    if currentNode == destination{
+    if currentNode == dest{
         shortest.append(currentNode)
         pathFound = true
         return shortest
@@ -205,7 +266,14 @@ func pathFinder(current : Int, destination : Int) -> [Int]{
 //            print("Previous Node: " + String(a![1]))
 //            print("=====================================")
 //        }
-        shortest = extractPath(matrix: pathDictionary, start: current, Finish: destination)
+        if(dest != destination && str != current){
+            shortest.removeAll()
+            shortest += extractPath(matrix: pathDictionary, start: current, Finish: dest)
+            shortest += extractPath(matrix: pathDictionary, start: str, Finish: destination)
+        }
+        else{
+            shortest = extractPath(matrix: pathDictionary, start: current, Finish: destination)
+        }
         
         pathFound = true
         return shortest
