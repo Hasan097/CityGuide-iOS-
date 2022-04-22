@@ -228,8 +228,9 @@ func instructions(path : [Int], angle : Double) -> [Int : String]{
                     
                     pathCopy.remove(at: index!+1)
                     pathCopy.remove(at: index!+1)
-                    if index!+1 == path.count-1{
+                    if pathCopy[index!] == pathCopy.last{
                         instructionToUser.append(turnTowards(from: from, to: to) + dis + " and use the elevator to go to floor " + String(toFloor) + " to reach your destination.")
+                        break
                     }
                     else{
                         instructionToUser.append(turnTowards(from: from, to: to) + dis + " and use the elevator to go to floor " + String(toFloor))
@@ -295,6 +296,12 @@ func instructions(path : [Int], angle : Double) -> [Int : String]{
     for k in pathCopy{
         if k != pathCopy.last{
             atBeaconInstruction[k] = instructionToUser[pathCopy.firstIndex(of: k)!]
+        }
+        else{
+            let str = instructionToUser[pathCopy.firstIndex(of: k)!]
+            if(str.contains(" elevator ")){
+                atBeaconInstruction[k] = instructionToUser[pathCopy.firstIndex(of: k)!]
+            }
         }
     }
     
