@@ -36,10 +36,10 @@ func drawOnImage(_ image: UIImage, x : Int, y : Int) -> UIImage{
     // Get context here
     let context = UIGraphicsGetCurrentContext()
     
-    context?.setFillColor (UIColor.green.cgColor)
-    context?.setAlpha(0.5)
-    context?.setLineWidth(1.0)
-    context?.addEllipse(in: CGRect(x: x, y: y, width: 10, height: 10))
+    context?.setFillColor (UIColor.red.cgColor)
+    context?.setAlpha(1.0)
+    context?.setLineWidth(0.75)
+    context?.addEllipse(in: CGRect(x: x, y: y, width: 15, height: 15))
     context?.drawPath(using: .fillStroke)
     // Save context as new UIImage
     let myImage = UIGraphicsGetImageFromCurrentImageContext()

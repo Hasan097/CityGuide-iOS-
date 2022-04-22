@@ -297,7 +297,7 @@ func instructions(path : [Int], angle : Double) -> [Int : String]{
         if k != pathCopy.last{
             atBeaconInstruction[k] = instructionToUser[pathCopy.firstIndex(of: k)!]
         }
-        else{
+        else if pathCopy.firstIndex(of: k)! < instructionToUser.count{
             let str = instructionToUser[pathCopy.firstIndex(of: k)!]
             if(str.contains(" elevator ")){
                 atBeaconInstruction[k] = instructionToUser[pathCopy.firstIndex(of: k)!]

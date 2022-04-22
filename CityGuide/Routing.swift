@@ -65,7 +65,7 @@ func makeMatrix(template : [String:Any]){
 func checkForFloorChange(node : Int, curr : Int) -> [Int]{
     var startflrno = 0
     for i in dArray{    // to get starting floor number
-        if i["beacon_id"] as! Int == curr{
+        if i["node"] as! Int == curr{
             let flr = i["_level"] as? Int
             if(flr != nil){
                 startflrno = flr!
@@ -76,7 +76,7 @@ func checkForFloorChange(node : Int, curr : Int) -> [Int]{
     var floorSwitch = false
     var destFloorNum = 0
     for i in dArray{    // to get destination floor number
-        if i["beacon_id"] as! Int == node{
+        if i["node"] as! Int == node{
             let flr = i["_level"] as? Int
             if flr != startflrno{
                 floorSwitch = true
@@ -91,7 +91,7 @@ func checkForFloorChange(node : Int, curr : Int) -> [Int]{
             if let checkerForHub = i["locname"] as? String{
                 if checkerForHub.contains("Elevator "){
                     if i["_level"] as! Int == startflrno{
-                        let nD = i["beacon_id"] as! Int
+                        let nD = i["node"] as! Int
                         newDest[0] = nD
                     }
                 }
@@ -102,7 +102,7 @@ func checkForFloorChange(node : Int, curr : Int) -> [Int]{
             if let checkerForHub = i["locname"] as? String{
                 if checkerForHub.contains("Elevator "){
                     if i["_level"] as! Int == destFloorNum{
-                        let nS = i["beacon_id"] as! Int
+                        let nS = i["node"] as! Int
                         newDest[1] = nS
                     }
                 }
@@ -284,12 +284,10 @@ func pathFinder(current : Int, destination : Int) -> [Int]{
 func extractPath(matrix : [Int : [Int]], start : Int, Finish : Int) -> [Int]{
     var path : [Int] = []
     var prevNode : Int = -1
-
-    for keys in matrix.keys{
-        if Finish == keys{
-            path.append(Finish)
-            prevNode = matrix[keys]![1]
-        }
+    
+    if Finish < matrix.count && matrix[Finish] != nil{
+        path.append(Finish)
+        prevNode = matrix[Finish]![1]
     }
     
     if prevNode == start{

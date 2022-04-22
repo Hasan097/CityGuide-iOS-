@@ -927,7 +927,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         
         var user = 1
         let userProfile = UserDefaults.standard.value(forKey: "checkmarks") as? [String:Int]
-        if !userProfile!.isEmpty{
+        if userProfile == nil{
+            user = 0
+        }
+        else if !userProfile!.isEmpty{
             user = userProfile!["User Category"]!
         }
         
