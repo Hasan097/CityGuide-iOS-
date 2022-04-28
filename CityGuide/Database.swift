@@ -52,7 +52,7 @@ func postToDB(typeOfAction: String, beaconID: Int, auth: String, floorNum: Int?,
             let uploadJob = URLSession.shared.uploadTask(with: request, from: encrypt!) { data, response, error in
                     if error != nil {
                         DispatchQueue.main.async {
-                            let alert = UIAlertController(title: "Upload Didn't Work?", message: "Looks like the connection to the server didn't work.  Do you have Internet access?", preferredStyle: .alert)
+                            let alert = UIAlertController(title: "Connection Interrupted", message: "Looks like the connection to the server didn't work.  Do you have Internet access?", preferredStyle: .alert)
                             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
                             vc.present(alert, animated: true, completion: nil)
                         }
@@ -94,7 +94,7 @@ func postToDB(typeOfAction: String, beaconID: Int, auth: String, floorNum: Int?,
             let uploadJob = URLSession.shared.uploadTask(with: request, from: encrypt!) { data, response, error in
                     if error != nil {
                         DispatchQueue.main.async {
-                            let alert = UIAlertController(title: "Upload Didn't Work?", message: "Looks like the connection to the server didn't work.  Do you have Internet access?", preferredStyle: .alert)
+                            let alert = UIAlertController(title: "Connection Interrupted", message: "Looks like the connection to the server didn't work.  Do you have Internet access?", preferredStyle: .alert)
                             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
                             vc.present(alert, animated: true, completion: nil)
                         }
@@ -125,7 +125,7 @@ func postToDB(typeOfAction: String, beaconID: Int, auth: String, floorNum: Int?,
             let uploadJob = URLSession.shared.uploadTask(with: request, from: encrypt!) { data, response, error in
                     if error != nil {
                         DispatchQueue.main.async {
-                            let alert = UIAlertController(title: "Upload Didn't Work?", message: "Looks like the connection to the server didn't work.  Do you have Internet access?", preferredStyle: .alert)
+                            let alert = UIAlertController(title: "Connection Interrupted", message: "Looks like the connection to the server didn't work.  Do you have Internet access?", preferredStyle: .alert)
                             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
                             vc.present(alert, animated: true, completion: nil)
                         }

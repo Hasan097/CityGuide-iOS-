@@ -173,6 +173,29 @@ func generatePOIDirections(POI : [Int], angle : Double, currentNode : Int) -> [I
     return cardinalMatrix
 }
 
+func getOppositeDirection(dir : String) -> String{
+    switch(dir){
+    case "N":
+        return "S"
+    case "S":
+        return "N"
+    case "E":
+        return "W"
+    case "W":
+        return "E"
+    case "NE":
+        return "SW"
+    case "NW":
+        return "SE"
+    case "SE":
+        return "NW"
+    case "SW":
+        return "NE"
+    default:
+        return "Error"
+    }
+}
+
 func instructions(path : [Int], angle : Double) -> [Int : String]{
     var atBeaconInstruction : [Int : String] = [:]
     let userDirection = getDirection(angl: angle)
@@ -234,6 +257,8 @@ func instructions(path : [Int], angle : Double) -> [Int : String]{
                     }
                     else{
                         instructionToUser.append(turnTowards(from: from, to: to) + dis + " and use the elevator to go to floor " + String(toFloor))
+                        // We enter the elevator in one direction and exit it usign the opposite direction
+                        from  = getOppositeDirection(dir: to)
                     }
                 }
                 else{

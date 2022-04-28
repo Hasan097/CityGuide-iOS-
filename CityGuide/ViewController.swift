@@ -941,7 +941,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
         else{
             utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-            utterance.rate = 0.5
+            utterance.rate = 0.6
         }
         
         if(narator.isSpeaking && explorationFlag && voiceSearchFlag){
