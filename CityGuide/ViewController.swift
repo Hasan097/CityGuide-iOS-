@@ -182,14 +182,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     
     func didFindBeacon(beaconScanner: BeaconScanner, beaconInfo: BeaconInfo) {
         //NSLog("FIND: %@", beaconInfo.description)
-      }
+        callOperations(beaconScanner: beaconScanner, beaconInfo: beaconInfo)
+    }
+    
     func didLoseBeacon(beaconScanner: BeaconScanner, beaconInfo: BeaconInfo) {
         //NSLog("LOST: %@", beaconInfo.description)
     }
     func didUpdateBeacon(beaconScanner: BeaconScanner, beaconInfo: BeaconInfo) {
         //NSLog("UPDATE: %@", beaconInfo.description)
-        //beaconInfo.beaconID.bID
-        //beaconInfo.RSSI
+        callOperations(beaconScanner: beaconScanner, beaconInfo: beaconInfo)
+    }
+    
+    func callOperations(beaconScanner: BeaconScanner, beaconInfo: BeaconInfo){
         if userDefinedRssi == 0.0{
             userDefinedRssi = -80.0
         }
@@ -222,6 +226,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             updateBeaconReading(distance: CLOSEST_RSSI, beacon: CURRENT_NODE)
         }
     }
+    
     func didObserveURLBeacon(beaconScanner: BeaconScanner, URL: NSURL, RSSI: Int) {
         //do nothing here
     }
@@ -941,7 +946,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
         else{
             utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-            utterance.rate = 0.6
+            utterance.rate = 0.55
         }
         
         if(narator.isSpeaking && explorationFlag && voiceSearchFlag){
