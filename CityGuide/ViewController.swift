@@ -792,31 +792,53 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         var dest = ""
         var range = 0
         var similarToDest = ""
+        var userDestination = userDes
+        
+        //wh308 -> w h 308
+        let decimalChars = CharacterSet.decimalDigits
+        let decimalRange = userDestination.rangeOfCharacter(from: decimalChars)
+        var temp = ""
+        if decimalRange != nil{
+            for i in Array(userDestination.lowercased()){
+                if i.isLetter{
+                    temp.append(i)
+                    temp.append(" ")
+                }
+                else{
+                    temp.append(i)
+                }
+            }
+            userDestination = temp
+        }
+
         for k in destinations{
             var testRange = 0
-            if k.lowercased() == userDes.lowercased(){
+            if k.lowercased() == userDestination.lowercased(){
                 dest = k
                 break
             }
             else{
-                let words : [String] = userDes.lowercased().components(separatedBy: " ")
-                let destWords : [String] = k.lowercased().components(separatedBy: " ")
-                for v in words{
-                    if destWords.contains(v){
-                        testRange += 1
+                let words = userDestination.lowercased()
+                let destWords = k.lowercased()
+                for l in words.components(separatedBy: " "){
+                    if destWords.contains(l){
+                        testRange+=2
                     }
-                    else{
-                        for o in destWords{
-                            let check = levenshtein(aStr: v, bStr: o)
-                            if(check <= 2){
-                                testRange += 1
-                            }
-                        }
-                    }
+//                    else{
+//                        for o in destWords.components(separatedBy: " "){
+//                            if l != "" && o != ""{
+//                                let check = levenshtein(aStr: l, bStr: o)
+//                                if(check < 3){
+//                                    testRange += 1
+//                                }
+//                            }
+//                        }
+//                    }
                 }
                 if range < testRange{
                     range = testRange
                     similarToDest = k
+                    testRange = 0
                 }
             }
         }
