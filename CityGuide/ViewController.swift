@@ -766,22 +766,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
             }
         }
         else{
-            speakThis(sentence: "Please say your destination after the indication.")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                AudioServicesPlaySystemSound(1113)
-                if UIDevice.current.userInterfaceIdiom == .phone{
-                    self.hapticVibration()
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6){
-                    self.speechRecognizer.reset()
-                    self.speechRecognizer.transcribe()
-                    print("Transcription started...")
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, qos: .default) {
-                        self.speechRecognizer.stopTranscribing()
-                        print("Transcription has stopped...")
-                        print(self.speechRecognizer.transcript)
-                        self.checkForDistination(userDes: self.speechRecognizer.transcript)
-                        self.group.leave()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.speakThis(sentence: "Please say your destination after the indication.")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    AudioServicesPlaySystemSound(1113)
+                    if UIDevice.current.userInterfaceIdiom == .phone{
+                        self.hapticVibration()
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6){
+                        self.speechRecognizer.reset()
+                        self.speechRecognizer.transcribe()
+                        print("Transcription started...")
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, qos: .default) {
+                            self.speechRecognizer.stopTranscribing()
+                            print("Transcription has stopped...")
+                            print(self.speechRecognizer.transcript)
+                            self.checkForDistination(userDes: self.speechRecognizer.transcript)
+                            self.group.leave()
+                        }
                     }
                 }
             }
@@ -823,6 +825,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
                 for l in words.components(separatedBy: " "){
                     if destWords.contains(l){
                         testRange+=2
+                        if destWords.starts(with: l){
+                            testRange*=2
+                        }
                     }
 //                    else{
 //                        for o in destWords.components(separatedBy: " "){
@@ -845,10 +850,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         
         if similarToDest != ""{
             speakThis(sentence: "Did you mean " + similarToDest + "? Please confirm or say no after the indication.")
-            singleFire(check: 1)            // here is the problem
+            singleFire(check: 1)
             group.notify(queue: .main){
                 if self.userResponse{
                     dest = similarToDest
+                    self.userResponse = false
                 }
                 else{
                     self.speakThis(sentence: "Search cancelled.")
