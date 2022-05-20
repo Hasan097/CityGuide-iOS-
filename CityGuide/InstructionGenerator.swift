@@ -236,7 +236,7 @@ func instructions(path : [Int], angle : Double) -> [Int : String]{
                 }
                 
                 // Check for 2 elevators else normal instructions
-                if checkForElevator.contains("Elevator ") && checkForElevator2.contains("Elevator "){
+                if checkForElevator.contains("elevator") && checkForElevator2.contains("elevator"){
                     for nextNode in possibleBeaconLocations{
                         if Int(truncating: conn[nextNode]! as NSNumber) == pathCopy[pathCopy.firstIndex(of: i)! + 1]{
                             if from == ""{
