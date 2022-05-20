@@ -249,8 +249,30 @@ func instructions(path : [Int], angle : Double) -> [Int : String]{
                         }
                     }
                     
-                    pathCopy.remove(at: index!+1)
-                    pathCopy.remove(at: index!+1)
+                    var removeIdx = 1
+                    var e = index! + 2  // e is the second elevator index in the path
+                    if(e != path.count-1){  // if its not the end of the path
+                        var endElevator = checkForElevator2
+                        while(endElevator.contains("elevator")){    // traverse all elevators in path ex: 1->2->3
+                            e+=1
+                            removeIdx+=1
+                            if(e >= path.count){
+                                break
+                            }
+                            for j in dArray{
+                                if j["node"] as! Int == pathCopy[e]{
+                                    endElevator = (j["locname"] as? String)!
+                                    toFloor = (j["_level"] as? Int)!
+                                }
+                            }
+                        }
+                    }
+                    
+                    while(removeIdx > 0){
+                        pathCopy.remove(at: index!+1)
+                        removeIdx-=1
+                    }
+                    
                     if pathCopy[index!] == pathCopy.last{
                         instructionToUser.append(turnTowards(from: from, to: to) + dis + " and use the elevator to go to floor " + String(toFloor) + " to reach your destination.")
                         break
