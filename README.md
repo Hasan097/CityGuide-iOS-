@@ -1,12 +1,10 @@
 # CityGuide-iOS-
 An iOS version of the CityGuide App
 
----
 
 ## AppDelegate and SceneDelegate
 Default values of the application. Nothing was changed here. 
 
----
 
 ## ViewController
 The main page of the application.
@@ -100,7 +98,6 @@ The main page of the application.
 ### doubleTapped
 - Speak the previous command when user double taps the screen
 
----
 
 ## Instruction Generator
 Generate instructions based on user's orientation
@@ -128,7 +125,6 @@ Generate instructions based on user's orientation
 - Utilize the functions in this file and generate instructions
 - Final result is a dictionary with key as beaconID and instructions when close to it as value
 
----
 
 ## SettingsTableController
 - A table view controller for the settings page
@@ -136,7 +132,6 @@ Generate instructions based on user's orientation
 - Mostly UI and memory based code. Nothing too complicated 
 - The **UserDefaults** method is used to store user's settings in memory
 
----
 
 ## Routing
 Generate the matrix and use the pathfinding algorithm to get shortest path
@@ -158,7 +153,6 @@ Generate the matrix and use the pathfinding algorithm to get shortest path
 ### extractPath
 - Extract the path formed from the pathFinder algorithm in array format
 
----
 
 ## DataBase
 Functions to send and retrieve values from the server
@@ -175,33 +169,28 @@ Functions to send and retrieve values from the server
 - The dictionary that holds the values of a cluster of beacons
 - This variable is important for many of the code's operations
 
----
 
 ## SearchResultsVC
 - The view controller of the search results. Shows up when the user taps the search icon.  
 - Mostly UI stuff and filtering list based on user's typed information
 
----
 
 ## SpeechRecognizer
 - Transcription of the user's voice commands happens here
 - Added this code via open source github 
 
----
 
 ## LevenshteinDistance
 - Code used to find the closest match to a requested destination
 - If the user said "axis lab" this function scores it against "access lab" 
 - The score is returned and handled at the **checkForDestination** function in the main view
 
----
 
 ## BeaconScanner
 - File used to help detect EddyStone Beacons
 - Implements methods for detection
 - Found via open source github
 
----
 
 ## FloorPlanManipulation
 Code File to manipulate floor plan on the phone screen
@@ -213,5 +202,4 @@ Code File to manipulate floor plan on the phone screen
 ### drawOnImage
 - Draws the red dot on the floor plan indicating users location
 
----
 
