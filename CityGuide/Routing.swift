@@ -29,7 +29,7 @@ var matrix : [String:Int] = [
     "bnorth" : -10,          // N
     "ndist" : -10
 ]
-var matrixDictionary : [Int:Any] = [:]
+var matrixDictionary : [Int:Any] = [:]          // This is an adjacency list and not a matrix for Dijkstra's algorithm
 var current = -1
 var shortestPath : [Int] = []
 var pathFound = false
@@ -113,7 +113,7 @@ func checkForFloorChange(node : Int, curr : Int) -> [Int]{
     return newDest
 }
 
-func pathFinder(current : Int, destination : Int) -> [Int]{
+func pathFinder(current : Int, destination : Int) -> [Int]{         // This is the main function for path finding. Here is where Dijkstra's is actually used
     var visited : [Int] = []            // An array of visted nodes
     var unvisited : [Int] = []          // An array of unvisited nodes
     var currentNode = current

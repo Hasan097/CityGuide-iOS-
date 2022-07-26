@@ -126,7 +126,7 @@ func distCalculator (cost : Int) -> String{
     return distanceDialog
 }
 
-func cardinalDirection(compassIndication : String, userDirection : String) -> String{
+func cardinalDirection(compassIndication : String, userDirection : String) -> String{       // Used for exploration mode
     var guidance : String = "Error"
     let circle : [String] = ["bnorth", "bneast", "beast", "bseast", "bsouth", "bswest", "bwest", "bnwest"]
     let compass : [String] = ["N","NE","E","SE","S","SW","W","NW"]
@@ -158,7 +158,7 @@ func cardinalDirection(compassIndication : String, userDirection : String) -> St
     return guidance
 }
 
-func generatePOIDirections(POI : [Int], angle : Double, currentNode : Int) -> [Int : String]{
+func generatePOIDirections(POI : [Int], angle : Double, currentNode : Int) -> [Int : String]{           // Used for exploration mode
     let conn = matrixDictionary[currentNode] as! [String:Int]
     let possibleBeaconLocations = ["bnorth", "bneast", "beast", "bseast", "bsouth", "bswest", "bwest", "bnwest"]
     var cardinalMatrix : [Int: String] = [:]
@@ -196,7 +196,7 @@ func getOppositeDirection(dir : String) -> String{
     }
 }
 
-func instructions(path : [Int], angle : Double) -> [Int : String]{
+func instructions(path : [Int], angle : Double) -> [Int : String]{      // Used for Navigation mode
     var atBeaconInstruction : [Int : String] = [:]
     let userDirection = getDirection(angl: angle)
     let possibleBeaconLocations = ["bnorth", "bneast", "beast", "bseast", "bsouth", "bswest", "bwest", "bnwest"]

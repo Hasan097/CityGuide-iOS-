@@ -61,11 +61,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     var allowDot = false
     var searchListResetFlag = false
     
-    @objc func buttonDown(_ sender: UIButton) {
+    @objc func buttonDown(_ sender: UIButton) {     // May not be in use
         singleFire(check: nil)
     }
 
-    @objc func buttonUp(_ sender: UIButton) {
+    @objc func buttonUp(_ sender: UIButton) {       // May not be in use
         timer?.invalidate()
     }
     
@@ -120,17 +120,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         return true
     }
     
-    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {   // When app shake is detected run the doubletap method
         if motion == .motionShake{
             doubleTapped()
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {        // Hides the stop icon
         stopBtn.isHidden = true
     }
     
-    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {    // Gets angle of user
         UIView.animate(withDuration: 0.5) {
             let angle = newHeading.trueHeading
 //            let rad = angle * .pi / 180               // to convert degrees to radians
@@ -143,6 +143,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
     }
     
+    // This was used for ibeacon only hence commented out <-----
 //    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
 //        switch manager.authorizationStatus{
 //            case .authorizedAlways, .authorizedWhenInUse:
@@ -373,7 +374,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     // ===================================
     
     
-    func updateBeaconReading(distance : Double, beacon: Int){
+    func updateBeaconReading(distance : Double, beacon: Int){       // Talks to the server a lot, and calls modes
         
         if beacon != -1{
             if beaconList.contains(beacon) == false{
@@ -522,11 +523,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
 //        }
 //    }
     
-    func presentAlert(alert : UIAlertController){
+    func presentAlert(alert : UIAlertController){       // Funtion to help with alerts to the user
         self.present(alert, animated: true, completion: nil)
     }
 
-    @IBAction func didTapStop(_ sender: Any) {
+    @IBAction func didTapStop(_ sender: Any) {          // For the X icon. When tapped exit navigation mode
         indoorWayFindingFlag = false
         if UIDevice.current.userInterfaceIdiom == .phone{
             hapticVibration(atDestination: true)
@@ -537,7 +538,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         stopBtn.isHidden = true
         speakThis(sentence: "Routing stopped. Switching to exploration mode.")
     }
-    @IBAction func didTapSettingsButton(){
+    @IBAction func didTapSettingsButton(){      // button for settings
         let tvc = SettingsTableController()
         tvc.items = [
             "User Category",
@@ -560,7 +561,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
     }
     
     
-    @IBAction func searchTapped(_ sender: Any) {
+    @IBAction func searchTapped(_ sender: Any) {        // Magnigfying glass button method
         for i in dArray{
             if i["beacon_id"] as! Int == CURRENT_NODE{
                 if let checkerForHub = i["locname"] as? String{
@@ -726,7 +727,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         return false
     }
     
-    func singleFire(check : Int?){
+    func singleFire(check : Int?){          // Listen to the user's verbal responses, and implement methods based on reponses.
         let audioSession = AVAudioSession.sharedInstance()
         do
         {
@@ -790,7 +791,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
     }
     
-    func checkForDistination(userDes : String){
+    func checkForDistination(userDes : String){     // Checks if user specified destination is available in the pool
         var dest = ""
         var range = 0
         var similarToDest = ""
@@ -912,7 +913,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, AVSpeechSynth
         }
     }
     
-    func indoorKeyIgnition(){
+    func indoorKeyIgnition(){           // Sets flags just for navigation mode to work properly
         speechFlag = true
         recursionFlag = false
         indoorWayFindingFlag = true

@@ -40,7 +40,7 @@ var destinations : [String] = []
 var listOfBeacon : [Int] = []
 var image : UIImage? = nil
 
-func postToDB(typeOfAction: String, beaconID: Int, auth: String, floorNum: Int?, vc : UIViewController){
+func postToDB(typeOfAction: String, beaconID: Int, auth: String, floorNum: Int?, vc : UIViewController){        // Main function
     switch typeOfAction{
         case "beacons":
             let url = URL(string: "http://wh-308-3922mm.dyn.wichita.edu:5000/data")
